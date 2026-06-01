@@ -430,8 +430,10 @@ async function phase2_llmFillBlanks(spreadsheetId: string): Promise<{ filled: nu
     const needsRewardsRate = !row[COL.REWARDS_RATE]?.trim();
     const needsBonus = !row[COL.BONUS]?.trim();
     const needsEditorial = !row[COL.EDITORIAL]?.trim();
+    const needsMinCredit = !row[COL.MIN_CREDIT]?.trim();
+    const needsRating = !row[COL.RATING]?.trim();
 
-    if (!needsTagline && !needsRewardsRate && !needsBonus && !needsEditorial) continue;
+    if (!needsTagline && !needsRewardsRate && !needsBonus && !needsEditorial && !needsMinCredit && !needsRating) continue;
 
     // Build a prompt for the LLM
     const fieldsNeeded: string[] = [];
@@ -439,6 +441,8 @@ async function phase2_llmFillBlanks(spreadsheetId: string): Promise<{ filled: nu
     if (needsRewardsRate) fieldsNeeded.push("rewardsRate");
     if (needsBonus) fieldsNeeded.push("welcomeBonus");
     if (needsEditorial) fieldsNeeded.push("editorialSummary");
+    if (needsMinCredit) fieldsNeeded.push("minCreditScore");
+    if (needsRating) fieldsNeeded.push("overallRating");
 
     const prompt = `You are a financial content writer for a credit card comparison website. Generate concise, accurate content for the following credit card.
 
@@ -456,6 +460,8 @@ Field requirements:
 - rewardsRate: describe the primary earning rate (e.g. "2% cash back on all purchases")
 - welcomeBonus: describe the current welcome offer in plain English (1-2 sentences)
 - editorialSummary: 2-3 sentences summarizing who this card is best for and why
+- minCreditScore: minimum credit score category required — MUST be exactly one of: "Any", "Fair", "Good", "Very Good", "Excellent"
+- overallRating: a numeric rating from 1.0 to 5.0 (one decimal place, e.g. 4.2) based on the card's overall value, rewards, fees, and benefits
 
 Return ONLY valid JSON.`;
 
@@ -477,8 +483,10 @@ Return ONLY valid JSON.`;
                 rewardsRate: { type: "string" },
                 welcomeBonus: { type: "string" },
                 editorialSummary: { type: "string" },
+                minCreditScore: { type: "string", enum: ["Any", "Fair", "Good", "Very Good", "Excellent"] },
+                overallRating: { type: "number" },
               },
-              required: ["tagline", "rewardsRate", "welcomeBonus", "editorialSummary"],
+              required: ["tagline", "rewardsRate", "welcomeBonus", "editorialSummary", "minCreditScore", "overallRating"],
               additionalProperties: false,
             },
           },
@@ -495,6 +503,8 @@ Return ONLY valid JSON.`;
         rewardsRate: string;
         welcomeBonus: string;
         editorialSummary: string;
+        minCreditScore: string;
+        overallRating: number;
       };
 
       // Ensure row is long enough
@@ -515,6 +525,16 @@ Return ONLY valid JSON.`;
       }
       if (needsEditorial && generated.editorialSummary) {
         row[COL.EDITORIAL] = generated.editorialSummary;
+        changed = true;
+      }
+      if (needsMinCredit && generated.minCreditScore) {
+        row[COL.MIN_CREDIT] = generated.minCreditScore;
+        changed = true;
+      }
+      if (needsRating && generated.overallRating != null) {
+        // Clamp to 1.0–5.0 and round to 1 decimal
+        const rating = Math.min(5.0, Math.max(1.0, Math.round(generated.overallRating * 10) / 10));
+        row[COL.RATING] = String(rating);
         changed = true;
       }
 
