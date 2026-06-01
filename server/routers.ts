@@ -6,6 +6,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { invokeLLM } from "./_core/llm";
 import { runSheetsSync, getRecentSyncLogs } from "./sheetsSync";
+import { runGithubCardSync } from "./githubCardSync";
 import {
   addAuditLog,
   createArticle,
@@ -356,6 +357,11 @@ const adminRouter = router({
     .input(z.object({ limit: z.number().optional() }).optional())
     .query(async ({ input }) => {
       return getRecentSyncLogs(input?.limit ?? 10);
+    }),
+  runGithubPipeline: adminProcedure
+    .mutation(async () => {
+      const result = await runGithubCardSync("manual");
+      return result;
     }),
 });
 

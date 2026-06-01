@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import {
   CreditCard, DollarSign, FileText, Building2, AlertTriangle,
   TrendingUp, Clock, CheckCircle2, Activity, ArrowRight, Sparkles,
-  RefreshCw, Database, XCircle, BarChart3, Eye, MousePointerClick, Map
+  RefreshCw, Database, XCircle, BarChart3, Eye, MousePointerClick, Map, Github
 } from "lucide-react";
 
 function StatCard({ icon: Icon, label, value, sub, color = "navy" }: {
@@ -43,6 +43,7 @@ export default function AdminDashboard() {
   const { data: cronTaskUid } = trpc.sitemap.getCronTaskUid.useQuery();
   const generateSitemapMutation = trpc.sitemap.generate.useMutation();
   const scheduleAutoRegenMutation = trpc.sitemap.scheduleAutoRegen.useMutation();
+  const githubPipelineMutation = trpc.admin.runGithubPipeline.useMutation();
   const utils = trpc.useUtils();
 
   const handleFlagStale = async () => {
@@ -178,6 +179,53 @@ export default function AdminDashboard() {
           <Link href="/admin/audit-log" className="text-xs text-accent hover:underline mt-3 block">
             View full audit log →
           </Link>
+        </div>
+      </div>
+
+      {/* GitHub Card Pipeline */}
+      <div className="card-premium p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-foreground flex items-center gap-2">
+            <Github className="w-4 h-4 text-accent" /> GitHub Card Pipeline
+          </h2>
+          <Button
+            size="sm"
+            onClick={async () => {
+              try {
+                const result = await githubPipelineMutation.mutateAsync();
+                toast.success(
+                  `Pipeline complete — ${result.phase1.added} added, ${result.phase1.updated} updated, ${result.phase2.filled} LLM-filled, ${result.phase3.offersUpserted} offers synced to DB.`
+                );
+                utils.admin.dashboard.invalidate();
+                refetchSyncLogs();
+              } catch (err: any) {
+                toast.error(`Pipeline failed: ${err.message}`);
+              }
+            }}
+            disabled={githubPipelineMutation.isPending}
+            className="bg-[var(--teal-600)] hover:bg-[var(--teal-700)] text-white text-xs gap-1.5"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${githubPipelineMutation.isPending ? "animate-spin" : ""}`} />
+            {githubPipelineMutation.isPending ? "Running..." : "Run Pipeline Now"}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mb-3">
+          Runs the 3-phase daily pipeline: (1) fetches the latest card data from GitHub and writes non-protected columns to the Google Sheet, (2) uses AI to fill any blank editorial fields (tagline, rewards rate, welcome bonus, summary), then (3) syncs the sheet back to the database.
+        </p>
+        {githubPipelineMutation.data && (
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800">
+            <CheckCircle2 className="w-3.5 h-3.5 inline mr-1.5" />
+            Last run: <strong>{githubPipelineMutation.data.phase1.added}</strong> cards added,{" "}
+            <strong>{githubPipelineMutation.data.phase1.updated}</strong> updated,{" "}
+            <strong>{githubPipelineMutation.data.phase2.filled}</strong> AI-filled,{" "}
+            <strong>{githubPipelineMutation.data.phase3.offersUpserted}</strong> synced to DB.
+            {githubPipelineMutation.data.phase3.errors.length > 0 && (
+              <span className="text-amber-700 ml-2">({githubPipelineMutation.data.phase3.errors.length} warnings)</span>
+            )}
+          </div>
+        )}
+        <div className="mt-3 text-xs text-muted-foreground">
+          <Clock className="w-3 h-3 inline mr-1" /> Runs automatically every day at 2:00 AM UTC (requires deploy + cron activation).
         </div>
       </div>
 

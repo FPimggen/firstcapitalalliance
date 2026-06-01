@@ -174,3 +174,11 @@
 - [x] Remove bg-muted/border/rounded container styling from ProviderPage.tsx (header)
 - [x] Remove bg-muted/border/rounded container styling from Home.tsx (featured offers section)
 - [x] Verified 0 remaining instances of `bg-muted border border-border` on logo images across all .tsx files
+
+## Daily GitHub → Sheet → DB Pipeline
+- [x] Create server/githubCardSync.ts: fetch GitHub JSON, upsert non-protected columns into Google Sheet Credit Cards tab
+- [x] LLM content generation (Phase 2) built into githubCardSync.ts
+- [x] Wire Phase 3: after sheet write-back, trigger runSheetsSync()
+- [x] Register /api/scheduled/github-card-sync endpoint in server/_core/index.ts
+- [ ] Create daily Heartbeat cron (2 AM UTC) via manus-heartbeat CLI after deploy (requires deploy first)
+- [x] Add "Run Pipeline Now" button to Admin Dashboard

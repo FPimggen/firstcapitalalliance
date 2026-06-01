@@ -4,6 +4,7 @@ import { getDb, recordSitemapGeneration } from "./db";
 import { offers, categories, articles, providers, sitemapMeta } from "../drizzle/schema";
 import { lt, and, isNull, or, eq, count } from "drizzle-orm";
 import { runSheetsSync } from "./sheetsSync";
+import { runGithubCardSync } from "./githubCardSync";
 
 /**
  * POST /api/scheduled/offer-audit
@@ -209,6 +210,45 @@ export async function handleSitemapRegen(req: Request, res: Response) {
       error: err.message,
       stack: err.stack,
       context: { url: req.url, taskUid: (err as any).taskUid },
+      timestamp: new Date().toISOString(),
+    });
+  }
+}
+
+/**
+ * POST /api/scheduled/github-card-sync
+ * Heartbeat cron: daily 3-phase pipeline
+ *   Phase 1 — GitHub JSON → Google Sheet (non-protected columns only)
+ *   Phase 2 — LLM fills blank editorial fields in the sheet
+ *   Phase 3 — Sheet → DB sync
+ */
+export async function handleGithubCardSync(req: Request, res: Response) {
+  try {
+    const user = await sdk.authenticateRequest(req);
+    // Allow both cron triggers and manual admin triggers
+    if (!user.isCron && user.role !== "admin") {
+      return res.status(403).json({ error: "cron or admin only" });
+    }
+
+    const result = await runGithubCardSync(user.isCron ? "scheduled" : "manual");
+
+    return res.json({
+      ok: true,
+      phase1: result.phase1,
+      phase2: result.phase2,
+      phase3: {
+        providersUpserted: result.phase3.providersUpserted,
+        offersUpserted: result.phase3.offersUpserted,
+        errors: result.phase3.errors,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error("[GithubCardSync] Error:", err);
+    return res.status(500).json({
+      error: err.message,
+      stack: err.stack,
+      context: { url: req.url },
       timestamp: new Date().toISOString(),
     });
   }

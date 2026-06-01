@@ -8,7 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { handleOfferAudit, handleSitemap, handleSheetsSync, handleSitemapRegen } from "../scheduledHandlers";
+import { handleOfferAudit, handleSitemap, handleSheetsSync, handleSitemapRegen, handleGithubCardSync } from "../scheduledHandlers";
 import { handleImageUpload } from "../uploadHandler";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -47,6 +47,7 @@ async function startServer() {
   app.post("/api/scheduled/offer-audit", handleOfferAudit);
   app.post("/api/scheduled/sheets-sync", handleSheetsSync);
   app.post("/api/scheduled/sitemap-regen", handleSitemapRegen);
+  app.post("/api/scheduled/github-card-sync", handleGithubCardSync);
 
   // tRPC API
   app.use(
