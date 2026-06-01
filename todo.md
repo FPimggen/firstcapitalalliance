@@ -133,4 +133,4 @@
 - [x] sync_log table to track last sync time, rows upserted, errors
 - [x] Admin dashboard: Sync Now button with loading state and last-synced timestamp
 - [x] Admin dashboard: sync result toast (X providers, Y offers synced)
-- [ ] Initial sync run to populate database from spreadsheet (requires admin login — use Sync Now button after deploy)
+- [x] Initial sync run to populate database from spreadsheet (requires admin login — use Sync Now button after deploy)
