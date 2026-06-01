@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import {
   CreditCard, DollarSign, FileText, Building2, AlertTriangle,
   TrendingUp, Clock, CheckCircle2, Activity, ArrowRight, Sparkles,
-  RefreshCw, Database, XCircle
+  RefreshCw, Database, XCircle, BarChart3, Eye, MousePointerClick, Map
 } from "lucide-react";
 
 function StatCard({ icon: Icon, label, value, sub, color = "navy" }: {
@@ -38,11 +38,24 @@ export default function AdminDashboard() {
   const flagMutation = trpc.agent.flagStaleOffers.useMutation();
   const syncMutation = trpc.admin.syncSheets.useMutation();
   const { data: syncLogs, refetch: refetchSyncLogs } = trpc.admin.syncLogs.useQuery({ limit: 5 });
+  const { data: offerStats } = trpc.tracking.getStats.useQuery();
+  const { data: sitemapMeta } = trpc.sitemap.getLatestMeta.useQuery();
+  const generateSitemapMutation = trpc.sitemap.generate.useMutation();
   const utils = trpc.useUtils();
 
   const handleFlagStale = async () => {
     await flagMutation.mutateAsync();
     utils.admin.dashboard.invalidate();
+  };
+
+  const handleGenerateSitemap = async () => {
+    try {
+      const result = await generateSitemapMutation.mutateAsync();
+      toast.success(`Sitemap generated — ${result.urlCount} URLs indexed.`);
+      utils.sitemap.getLatestMeta.invalidate();
+    } catch (err: any) {
+      toast.error(`Sitemap generation failed: ${err.message}`);
+    }
   };
 
   const handleSyncNow = async () => {
@@ -226,6 +239,100 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <p className="text-xs text-muted-foreground">No sync history yet. Run your first sync above.</p>
+        )}
+      </div>
+
+      {/* Offer Analytics */}
+      <div className="card-premium p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-foreground flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-accent" /> Offer Analytics
+          </h2>
+          <Link href="/admin/analytics">
+            <Button size="sm" variant="outline" className="text-xs gap-1">
+              View All <ArrowRight className="w-3 h-3" />
+            </Button>
+          </Link>
+        </div>
+        {!offerStats || (offerStats as any[]).length === 0 ? (
+          <p className="text-xs text-muted-foreground">No tracking data yet. Views and clicks will appear here as visitors browse offers.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 text-muted-foreground font-medium">Offer</th>
+                  <th className="text-right py-2 text-muted-foreground font-medium"><Eye className="w-3 h-3 inline mr-1" />Views</th>
+                  <th className="text-right py-2 text-muted-foreground font-medium"><MousePointerClick className="w-3 h-3 inline mr-1" />Clicks</th>
+                  <th className="text-right py-2 text-muted-foreground font-medium">CTR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(offerStats as any[]).slice(0, 10).map((row: any) => {
+                  const ctr = row.views > 0 ? ((row.clicks / row.views) * 100).toFixed(1) : "—";
+                  return (
+                    <tr key={row.offerId} className="border-b border-border last:border-0 hover:bg-muted/50">
+                      <td className="py-2 font-medium text-foreground">
+                        <Link href={`/offers/${row.slug}`} className="hover:text-accent">
+                          {row.productName}
+                        </Link>
+                        <div className="text-muted-foreground text-xs">{row.providerName}</div>
+                      </td>
+                      <td className="py-2 text-right text-foreground">{row.views.toLocaleString()}</td>
+                      <td className="py-2 text-right text-foreground">{row.clicks.toLocaleString()}</td>
+                      <td className="py-2 text-right">
+                        <span className={`font-medium ${parseFloat(ctr) > 10 ? "text-emerald-600" : parseFloat(ctr) > 5 ? "text-amber-600" : "text-muted-foreground"}`}>
+                          {ctr}{ctr !== "—" ? "%" : ""}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Sitemap Management */}
+      <div className="card-premium p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-foreground flex items-center gap-2">
+            <Map className="w-4 h-4 text-accent" /> Sitemap
+          </h2>
+          <Button
+            size="sm"
+            onClick={handleGenerateSitemap}
+            disabled={generateSitemapMutation.isPending}
+            className="bg-[var(--navy-800)] hover:bg-[var(--navy-900)] text-white text-xs gap-1.5"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${generateSitemapMutation.isPending ? "animate-spin" : ""}`} />
+            {generateSitemapMutation.isPending ? "Generating..." : "Generate Now"}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mb-3">
+          The sitemap is served dynamically at <a href="/sitemap.xml" target="_blank" className="text-accent hover:underline">/sitemap.xml</a> and auto-regenerates every 7 days via a scheduled heartbeat. Click "Generate Now" to record a manual generation.
+        </p>
+        {sitemapMeta ? (
+          <div className="flex flex-wrap gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-muted-foreground">Last generated:</span>
+              <span className="font-medium text-foreground">{new Date((sitemapMeta as any).generatedAt).toLocaleString()}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Map className="w-3.5 h-3.5 text-accent" />
+              <span className="text-muted-foreground">URLs indexed:</span>
+              <span className="font-medium text-foreground">{(sitemapMeta as any).urlCount?.toLocaleString() ?? "—"}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-muted-foreground">Triggered by:</span>
+              <Badge className="text-xs border-0 bg-muted text-muted-foreground">{(sitemapMeta as any).triggeredBy}</Badge>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">No sitemap generation recorded yet. Click "Generate Now" to create the first record.</p>
         )}
       </div>
 

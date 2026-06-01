@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import { sdk } from "./_core/sdk";
-import { getDb } from "./db";
-import { offers, categories, articles, providers } from "../drizzle/schema";
-import { lt, and, isNull, or, eq } from "drizzle-orm";
+import { getDb, recordSitemapGeneration } from "./db";
+import { offers, categories, articles, providers, sitemapMeta } from "../drizzle/schema";
+import { lt, and, isNull, or, eq, count } from "drizzle-orm";
 import { runSheetsSync } from "./sheetsSync";
 
 /**
@@ -146,5 +146,58 @@ ${allUrls.map((u) => `  <url>
   } catch (err: any) {
     console.error("[Sitemap] Error:", err);
     return res.status(500).send("Sitemap generation failed");
+  }
+}
+
+/**
+ * POST /api/scheduled/sitemap-regen
+ * Heartbeat cron: records a sitemap generation event every 7 days.
+ * The sitemap itself is generated dynamically on every GET /sitemap.xml request.
+ * This cron records the scheduled generation in sitemap_meta for admin visibility.
+ */
+export async function handleSitemapRegen(req: Request, res: Response) {
+  try {
+    const user = await sdk.authenticateRequest(req);
+    if (!user.isCron) {
+      return res.status(403).json({ error: "cron-only endpoint" });
+    }
+
+    const db = await getDb();
+    if (!db) {
+      return res.status(500).json({ error: "Database unavailable" });
+    }
+
+    // Count current public URLs
+    const [activeOffers, activeProviders, publishedArticles, activeCategories] = await Promise.all([
+      db.select({ c: count() }).from(offers).where(eq(offers.isActive, true)),
+      db.select({ c: count() }).from(providers).where(eq(providers.isActive, true)),
+      db.select({ c: count() }).from(articles).where(eq(articles.status, "published")),
+      db.select({ c: count() }).from(categories).where(eq(categories.isActive, true)),
+    ]);
+
+    const staticRouteCount = 25; // approximate static routes
+    const urlCount =
+      staticRouteCount +
+      (activeOffers[0]?.c ?? 0) +
+      (activeProviders[0]?.c ?? 0) +
+      (publishedArticles[0]?.c ?? 0) +
+      (activeCategories[0]?.c ?? 0);
+
+    await recordSitemapGeneration({ urlCount, triggeredBy: "scheduled" });
+
+    console.log(`[Sitemap Regen] Recorded scheduled generation: ${urlCount} URLs`);
+    return res.json({
+      ok: true,
+      urlCount,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error("[Sitemap Regen] Error:", err);
+    return res.status(500).json({
+      error: err.message,
+      stack: err.stack,
+      context: { url: req.url, taskUid: (err as any).taskUid },
+      timestamp: new Date().toISOString(),
+    });
   }
 }

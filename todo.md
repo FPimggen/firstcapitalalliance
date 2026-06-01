@@ -153,3 +153,16 @@
 - [x] Add CDs category to sheetsSync and seed CD category in DB
 - [x] Add checking-accounts, cds routes to App.tsx with ComparisonPage
 - [x] Add category metadata for checking-accounts and cds in ComparisonPage
+
+## Offer Tracking + Sitemap Generator
+
+- [ ] Add offer_events table (offer_id, event_type: view|click, created_at, session_id) to drizzle schema
+- [ ] Add offer_stats query helper in db.ts (views + clicks per offer)
+- [ ] Add tRPC procedures: trackOfferEvent (public), getOfferStats (admin)
+- [ ] Wire view tracking on OfferDetailPage mount
+- [ ] Wire click tracking on all apply/CTA buttons across the site
+- [ ] Build sitemap generator (server-side, generates XML from DB, stores in sitemap_meta table)
+- [ ] Add /api/scheduled/generate-sitemap heartbeat handler
+- [ ] Register 7-day heartbeat cron via manus-heartbeat CLI (after deploy)
+- [ ] Add admin dashboard: Offer Analytics tab (views + clicks table, sortable)
+- [ ] Add admin dashboard: Sitemap panel (last generated, manual regenerate button)

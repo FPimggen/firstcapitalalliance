@@ -3,7 +3,7 @@ import { getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, CreditCard, Building2, FolderOpen, FileText,
-  Activity, Sparkles, ChevronRight, LogOut, Shield, ExternalLink
+  Activity, Sparkles, ChevronRight, LogOut, Shield, ExternalLink, BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { label: "Providers", href: "/admin/providers", icon: Building2 },
   { label: "Categories", href: "/admin/categories", icon: FolderOpen },
   { label: "Articles", href: "/admin/articles", icon: FileText },
+  { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { label: "AI Tools", href: "/admin/ai-tools", icon: Sparkles },
   { label: "Audit Log", href: "/admin/audit-log", icon: Activity },
 ];

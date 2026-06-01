@@ -1,4 +1,5 @@
 import { useParams, Link } from "wouter";
+import { useEffect } from "react";
 import PublicLayout from "@/components/PublicLayout";
 import SEOMeta, { buildBreadcrumbSchema, buildFinancialProductSchema } from "@/components/SEOMeta";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -19,9 +20,25 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
+// Generate a stable session ID for this browser session
+function getSessionId() {
+  let sid = sessionStorage.getItem("fca_sid");
+  if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem("fca_sid", sid); }
+  return sid;
+}
+
 export default function OfferDetailPage() {
   const params = useParams<{ slug: string }>();
   const { data, isLoading, error } = trpc.offers.bySlug.useQuery({ slug: params.slug ?? "" });
+  const trackEvent = trpc.tracking.trackEvent.useMutation();
+
+  // Track view once offer data is loaded
+  useEffect(() => {
+    if (data?.offer?.id) {
+      trackEvent.mutate({ offerId: data.offer.id, eventType: "view", sessionId: getSessionId(), referrer: document.referrer.slice(0, 512) });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.offer?.id]);
 
   if (isLoading) {
     return (
@@ -120,6 +137,7 @@ export default function OfferDetailPage() {
                 target="_blank"
                 rel="nofollow sponsored noopener noreferrer"
                 className="btn-cta px-6 py-3 shrink-0 inline-flex items-center gap-2"
+                onClick={() => trackEvent.mutate({ offerId: offer.id, eventType: "click", sessionId: getSessionId() })}
               >
                 Apply Now <ExternalLink className="w-4 h-4" />
               </a>
@@ -298,6 +316,7 @@ export default function OfferDetailPage() {
                   target="_blank"
                   rel="nofollow sponsored noopener noreferrer"
                   className="btn-cta w-full justify-center mt-4 inline-flex items-center gap-2"
+                  onClick={() => trackEvent.mutate({ offerId: offer.id, eventType: "click", sessionId: getSessionId() })}
                 >
                   Apply Now <ExternalLink className="w-4 h-4" />
                 </a>

@@ -225,3 +225,36 @@ export const syncLog = mysqlTable("sync_log", {
 
 export type SyncLog = typeof syncLog.$inferSelect;
 export type InsertSyncLog = typeof syncLog.$inferInsert;
+
+// ─── Offer Events (view/click tracking) ──────────────────────────────────────
+export const offerEvents = mysqlTable(
+  "offer_events",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    offerId: int("offerId").notNull(),
+    eventType: mysqlEnum("eventType", ["view", "click"]).notNull(),
+    sessionId: varchar("sessionId", { length: 128 }),
+    referrer: varchar("referrer", { length: 512 }),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => [
+    index("idx_offer_events_offer").on(t.offerId),
+    index("idx_offer_events_type").on(t.eventType),
+    index("idx_offer_events_created").on(t.createdAt),
+  ]
+);
+
+export type OfferEvent = typeof offerEvents.$inferSelect;
+export type InsertOfferEvent = typeof offerEvents.$inferInsert;
+
+// ─── Sitemap Meta ─────────────────────────────────────────────────────────────
+export const sitemapMeta = mysqlTable("sitemap_meta", {
+  id: int("id").autoincrement().primaryKey(),
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+  urlCount: int("urlCount").default(0),
+  triggeredBy: mysqlEnum("triggeredBy", ["manual", "scheduled"]).notNull().default("manual"),
+  scheduleCronTaskUid: varchar("scheduleCronTaskUid", { length: 65 }),
+});
+
+export type SitemapMeta = typeof sitemapMeta.$inferSelect;
+export type InsertSitemapMeta = typeof sitemapMeta.$inferInsert;

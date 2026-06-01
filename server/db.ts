@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, isNull, like, lt, or, sql } from "drizzle-orm";
+import { and, count as countFn, desc, eq, gte, isNull, like, lt, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   Article,
@@ -10,8 +10,10 @@ import {
   InsertCategory,
   InsertContentJob,
   InsertOffer,
+  InsertOfferEvent,
   InsertPage,
   InsertProvider,
+  InsertSitemapMeta,
   InsertUser,
   Offer,
   Page,
@@ -20,10 +22,12 @@ import {
   auditLog,
   categories,
   contentJobs,
+  offerEvents,
   offerPageMap,
   offers,
   pages,
   providers,
+  sitemapMeta,
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -409,6 +413,97 @@ export async function getDashboardStats() {
     db.select({ count: sql<number>`count(*)` }).from(articles).where(eq(articles.status, "draft")),
   ]);
   return { totalOffers: Number(totalOffers), totalProviders: Number(totalProviders), totalArticles: Number(totalArticles), totalCategories: Number(totalCategories), staleOffers: Number(staleOffers), draftArticles: Number(draftArticles) };
+}
+
+// ─── Offer Events (tracking) ─────────────────────────────────────────────────
+export async function trackOfferEvent(data: InsertOfferEvent) {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.insert(offerEvents).values(data);
+  } catch (e) {
+    console.warn("[Tracking] Failed to record event:", e);
+  }
+}
+
+export async function getOfferStats(limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  // Aggregate views, clicks, and last event per offer
+  const rows = await db
+    .select({
+      offerId: offerEvents.offerId,
+      eventType: offerEvents.eventType,
+      eventCount: sql<number>`count(*)`,
+      lastAt: sql<Date>`max(${offerEvents.createdAt})`,
+    })
+    .from(offerEvents)
+    .groupBy(offerEvents.offerId, offerEvents.eventType);
+
+  // Pivot into per-offer objects
+  const map = new Map<number, { offerId: number; views: number; clicks: number; lastEventAt: Date | null }>();
+  for (const row of rows) {
+    if (!map.has(row.offerId)) map.set(row.offerId, { offerId: row.offerId, views: 0, clicks: 0, lastEventAt: null });
+    const entry = map.get(row.offerId)!;
+    if (row.eventType === "view") { entry.views = Number(row.eventCount); entry.lastEventAt = row.lastAt; }
+    else if (row.eventType === "click") { entry.clicks = Number(row.eventCount); if (!entry.lastEventAt || row.lastAt > entry.lastEventAt) entry.lastEventAt = row.lastAt; }
+  }
+
+  // Join with offer names, provider, and category
+  const offerIds = Array.from(map.keys());
+  if (offerIds.length === 0) return [];
+  const offerRows = await db
+    .select({ id: offers.id, productName: offers.productName, slug: offers.slug, categoryId: offers.categoryId, providerId: offers.providerId })
+    .from(offers)
+    .where(sql`${offers.id} IN (${sql.join(offerIds.map(id => sql`${id}`), sql`, `)})`);
+
+  const providerMap = new Map<number, string>();
+  const provRows = await db.select({ id: providers.id, name: providers.name }).from(providers);
+  provRows.forEach(p => providerMap.set(p.id, p.name));
+
+  const categoryMap = new Map<number, string>();
+  const catRows = await db.select({ id: categories.id, slug: categories.slug }).from(categories);
+  catRows.forEach(c => categoryMap.set(c.id, c.slug));
+
+  return offerRows.map(o => ({
+    offerId: o.id,
+    productName: o.productName,
+    slug: o.slug,
+    providerName: providerMap.get(o.providerId) ?? "Unknown",
+    categorySlug: categoryMap.get(o.categoryId ?? 0) ?? null,
+    views: map.get(o.id)?.views ?? 0,
+    clicks: map.get(o.id)?.clicks ?? 0,
+    lastEventAt: map.get(o.id)?.lastEventAt ?? null,
+    ctr: map.get(o.id)?.views
+      ? Math.round(((map.get(o.id)?.clicks ?? 0) / (map.get(o.id)?.views ?? 1)) * 1000) / 10
+      : 0,
+  })).sort((a, b) => (b.views + b.clicks) - (a.views + a.clicks)).slice(0, limit);
+}
+
+// ─── Sitemap Meta ─────────────────────────────────────────────────────────────
+export async function recordSitemapGeneration(data: InsertSitemapMeta) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(sitemapMeta).values(data);
+}
+
+export async function getLatestSitemapMeta() {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(sitemapMeta).orderBy(desc(sitemapMeta.generatedAt)).limit(1);
+  return result[0];
+}
+
+export async function getSitemapCronTaskUid() {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db
+    .select({ uid: sitemapMeta.scheduleCronTaskUid })
+    .from(sitemapMeta)
+    .where(sql`${sitemapMeta.scheduleCronTaskUid} IS NOT NULL`)
+    .orderBy(desc(sitemapMeta.generatedAt))
+    .limit(1);
+  return result[0]?.uid ?? undefined;
 }
 
 // ─── Sitemap data ─────────────────────────────────────────────────────────────

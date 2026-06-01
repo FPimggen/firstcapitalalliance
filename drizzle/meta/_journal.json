@@ -29,6 +29,13 @@
       "when": 1780291318630,
       "tag": "0003_dapper_photon",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1780326863900,
+      "tag": "0004_daffy_puppet_master",
+      "breakpoints": true
     }
   ]
 }

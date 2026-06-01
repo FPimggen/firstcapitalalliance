@@ -21,6 +21,7 @@ import AdminProviders from "./pages/admin/AdminProviders";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminAITools from "./pages/admin/AdminAITools";
 import AdminAuditLog from "./pages/admin/AdminAuditLog";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 
 // Calculator pages
 import ToolsHub from "./pages/tools/ToolsHub";
@@ -151,6 +152,7 @@ function Router() {
       <Route path="/admin/articles/new">{() => <AdminRoute component={AdminArticles} />}</Route>
       <Route path="/admin/ai-tools">{() => <AdminRoute component={AdminAITools} />}</Route>
       <Route path="/admin/audit-log">{() => <AdminRoute component={AdminAuditLog} />}</Route>
+      <Route path="/admin/analytics">{() => <AdminRoute component={AdminAnalytics} />}</Route>
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

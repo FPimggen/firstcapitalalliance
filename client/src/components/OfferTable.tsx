@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { trpc } from "@/lib/trpc";
 import { ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Star, CheckCircle2, Clock, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,7 +74,14 @@ function LastVerified({ date }: { date: Date | null | undefined }) {
   );
 }
 
+function getSessionId() {
+  let sid = sessionStorage.getItem("fca_sid");
+  if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem("fca_sid", sid); }
+  return sid;
+}
+
 export default function OfferTable({ offers, showCategory = false }: OfferTableProps) {
+  const trackEvent = trpc.tracking.trackEvent.useMutation();
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [creditFilter, setCreditFilter] = useState<string>("all");
@@ -261,6 +269,7 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
                         target="_blank"
                         rel="nofollow sponsored noopener noreferrer"
                         className="btn-cta text-xs px-3 py-1.5 inline-flex items-center gap-1"
+                        onClick={() => trackEvent.mutate({ offerId: offer.id, eventType: "click", sessionId: getSessionId() })}
                       >
                         Apply Now <ExternalLink className="w-3 h-3" />
                       </a>
@@ -318,7 +327,8 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
             <LastVerified date={offer.lastVerifiedAt} />
             <div className="flex gap-2 mt-3">
               {offer.trackingUrl && (
-                <a href={offer.trackingUrl} target="_blank" rel="nofollow sponsored noopener noreferrer" className="btn-cta text-xs px-3 py-2 flex-1 justify-center inline-flex items-center gap-1">
+                <a href={offer.trackingUrl} target="_blank" rel="nofollow sponsored noopener noreferrer" className="btn-cta text-xs px-3 py-2 flex-1 justify-center inline-flex items-center gap-1"
+                  onClick={() => trackEvent.mutate({ offerId: offer.id, eventType: "click", sessionId: getSessionId() })}>
                   Apply Now <ExternalLink className="w-3 h-3" />
                 </a>
               )}

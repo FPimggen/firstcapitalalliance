@@ -36,8 +36,13 @@ import {
   getProviders,
   getPublishedArticles,
   getRecentJobs,
+  getLatestSitemapMeta,
+  getOfferStats,
+  getSitemapCronTaskUid,
   getSitemapData,
   getStaleOffers,
+  recordSitemapGeneration,
+  trackOfferEvent,
   updateArticle,
   updateCategory,
   updateContentJob,
@@ -435,8 +440,53 @@ Requirements:
 });
 
 // ─── Sitemap router ───────────────────────────────────────────────────────────
+// ─── Tracking router ─────────────────────────────────────────────────────────
+const trackingRouter = router({
+  trackEvent: publicProcedure
+    .input(z.object({
+      offerId: z.number(),
+      eventType: z.enum(["view", "click"]),
+      sessionId: z.string().optional(),
+      referrer: z.string().optional(),
+    }))
+    .mutation(({ input }) =>
+      trackOfferEvent({
+        offerId: input.offerId,
+        eventType: input.eventType,
+        sessionId: input.sessionId,
+        referrer: input.referrer,
+      })
+    ),
+  getStats: adminProcedure.query(() => getOfferStats(100)),
+});
+
 const sitemapRouter = router({
   data: publicProcedure.query(() => getSitemapData()),
+  getLatestMeta: adminProcedure.query(() => getLatestSitemapMeta()),
+  generate: adminProcedure.mutation(async ({ ctx }) => {
+    const { cats, provs, offs, arts } = await getSitemapData();
+    const baseUrl = "https://firstcapitalalliance.com";
+    const staticRoutes = [
+      "/", "/credit-cards", "/personal-loans", "/auto-loans", "/mortgages",
+      "/savings-accounts", "/checking-accounts", "/cds", "/mortgages/heloc",
+      "/compare", "/compare/credit-cards", "/credit-cards/cash-back",
+      "/credit-cards/travel", "/credit-cards/balance-transfer", "/credit-cards/credit-builder",
+      "/learn", "/credit-score", "/glossary", "/tools",
+      "/about", "/privacy", "/terms", "/editorial-policy",
+      "/affiliate-disclosure", "/how-we-make-money", "/methodology",
+    ];
+    const urls = [
+      ...staticRoutes.map(r => `${baseUrl}${r}`),
+      ...cats.map(c => `${baseUrl}/${c.slug}`),
+      ...provs.map(p => `${baseUrl}/providers/${p.slug}`),
+      ...offs.map(o => `${baseUrl}/offers/${o.slug}`),
+      ...arts.map(a => `${baseUrl}/learn/${a.slug}`),
+    ];
+    const uniqueUrls = Array.from(new Set(urls));
+    await recordSitemapGeneration({ urlCount: uniqueUrls.length, triggeredBy: "manual" });
+    await addAuditLog({ action: "generate_sitemap", entityType: "system", triggeredBy: ctx.user.name ?? ctx.user.openId });
+    return { urlCount: uniqueUrls.length };
+  }),
 });
 
 // ─── App router ───────────────────────────────────────────────────────────────
@@ -456,6 +506,7 @@ export const appRouter = router({
   articles: articlesRouter,
   admin: adminRouter,
   agent: agentRouter,
+  tracking: trackingRouter,
   sitemap: sitemapRouter,
 });
 
