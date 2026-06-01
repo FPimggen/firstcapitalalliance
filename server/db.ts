@@ -489,21 +489,21 @@ export async function recordSitemapGeneration(data: InsertSitemapMeta) {
 
 export async function getLatestSitemapMeta() {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return null;
   const result = await db.select().from(sitemapMeta).orderBy(desc(sitemapMeta.generatedAt)).limit(1);
-  return result[0];
+  return result[0] ?? null;
 }
 
 export async function getSitemapCronTaskUid() {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return null;
   const result = await db
     .select({ uid: sitemapMeta.scheduleCronTaskUid })
     .from(sitemapMeta)
     .where(sql`${sitemapMeta.scheduleCronTaskUid} IS NOT NULL`)
     .orderBy(desc(sitemapMeta.generatedAt))
     .limit(1);
-  return result[0]?.uid ?? undefined;
+  return result[0]?.uid ?? null;
 }
 
 // ─── Sitemap data ─────────────────────────────────────────────────────────────
