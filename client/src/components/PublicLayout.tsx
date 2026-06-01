@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, Shield } from "lucide-react";
 
@@ -38,18 +38,21 @@ const NAV_LINKS = [
   { label: "Learn", href: "/learn" },
 ];
 
-function DropdownMenu({ items }: { items: { label: string; href: string }[] }) {
+function DropdownMenu({ items, onMouseEnter, onMouseLeave }: { items: { label: string; href: string }[]; onMouseEnter: () => void; onMouseLeave: () => void }) {
   return (
-    <div className="absolute top-full left-0 mt-1 w-52 bg-card border border-border rounded-xl shadow-lg py-1.5 z-50">
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-accent transition-colors"
-        >
-          {item.label}
-        </Link>
-      ))}
+    // pt-2 creates an invisible bridge so the mouse doesn't leave the parent when moving from link to menu
+    <div className="absolute top-full left-0 pt-2 w-52 z-50" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <div className="bg-card border border-border rounded-xl shadow-lg py-1.5">
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-accent transition-colors"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
@@ -73,6 +76,20 @@ export function PublicNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [location] = useLocation();
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openDropdown = (href: string) => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    setActiveDropdown(href);
+  };
+
+  const scheduleClose = () => {
+    closeTimerRef.current = setTimeout(() => setActiveDropdown(null), 120);
+  };
+
+  const cancelClose = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--navy-950)] backdrop-blur-sm border-b border-[var(--navy-800)]">
@@ -93,8 +110,8 @@ export function PublicNav() {
               <div
                 key={link.href}
                 className="relative"
-                onMouseEnter={() => link.children && setActiveDropdown(link.href)}
-                onMouseLeave={() => setActiveDropdown(null)}
+                onMouseEnter={() => link.children && openDropdown(link.href)}
+                onMouseLeave={() => link.children && scheduleClose()}
               >
                 <Link
                   href={link.href}
@@ -108,7 +125,11 @@ export function PublicNav() {
                   {link.children && <ChevronDown className="w-3.5 h-3.5 text-white/60" />}
                 </Link>
                 {link.children && activeDropdown === link.href && (
-                  <DropdownMenu items={link.children} />
+                  <DropdownMenu
+                    items={link.children}
+                    onMouseEnter={cancelClose}
+                    onMouseLeave={scheduleClose}
+                  />
                 )}
               </div>
             ))}
