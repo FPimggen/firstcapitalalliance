@@ -34,6 +34,19 @@ const NAV_LINKS = [
       { label: "HELOC", href: "/mortgages/heloc" },
     ],
   },
+  {
+    label: "Tools",
+    href: "/tools",
+    children: [
+      { label: "All Calculators", href: "/tools" },
+      { label: "Mortgage Calculator", href: "/tools/mortgage-calculator" },
+      { label: "Auto Loan Calculator", href: "/tools/auto-loan-calculator" },
+      { label: "Credit Card Payoff", href: "/tools/credit-card-payoff-calculator" },
+      { label: "Debt Consolidation", href: "/tools/debt-consolidation-calculator" },
+      { label: "Savings Goal", href: "/tools/savings-goal-calculator" },
+      { label: "DTI Calculator", href: "/tools/dti-calculator" },
+    ],
+  },
   { label: "Providers", href: "/providers" },
   { label: "Learn", href: "/learn" },
 ];

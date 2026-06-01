@@ -18,9 +18,21 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOffers from "./pages/admin/AdminOffers";
 import AdminProviders from "./pages/admin/AdminProviders";
 import AdminCategories from "./pages/admin/AdminCategories";
-import AdminArticles from "./pages/admin/AdminArticles";
-import AdminAuditLog from "./pages/admin/AdminAuditLog";
 import AdminAITools from "./pages/admin/AdminAITools";
+import AdminAuditLog from "./pages/admin/AdminAuditLog";
+
+// Calculator pages
+import ToolsHub from "./pages/tools/ToolsHub";
+import MortgageCalculator from "./pages/tools/MortgageCalculator";
+import MortgageRefiCalculator from "./pages/tools/MortgageRefiCalculator";
+import HomeAffordabilityCalculator from "./pages/tools/HomeAffordabilityCalculator";
+import RentVsBuyCalculator from "./pages/tools/RentVsBuyCalculator";
+import { AutoLoanCalculator, AutoRefiCalculator } from "./pages/tools/AutoCalculators";
+import { SavingsGoalCalculator, SavingsComparisonCalculator, CDCalculator } from "./pages/tools/SavingsCalculators";
+import { PersonalLoanCalculator, LoanComparisonCalculator, DebtConsolidationCalculator, DebtPayoffCalculator } from "./pages/tools/LoanCalculators";
+import { CreditCardPayoffCalculator, CreditCardInterestCalculator, CreditCardRefiCalculator, BalanceTransferCalculator } from "./pages/tools/CreditCardCalculators";
+import { AprApyConverter, DTICalculator } from "./pages/tools/GeneralCalculators";
+import AdminArticles from "./pages/admin/AdminArticles";
 
 function AdminRoute({ component: Component }: { component: React.ComponentType }) {
   return (
@@ -49,6 +61,28 @@ function Router() {
 
       {/* Product detail pages */}
       <Route path="/offers/:slug" component={OfferDetailPage} />
+
+      {/* Calculator tools */}
+      <Route path="/tools" component={ToolsHub} />
+      <Route path="/tools/mortgage-calculator" component={MortgageCalculator} />
+      <Route path="/tools/mortgage-refi-calculator" component={MortgageRefiCalculator} />
+      <Route path="/tools/home-affordability-calculator" component={HomeAffordabilityCalculator} />
+      <Route path="/tools/rent-vs-buy-calculator" component={RentVsBuyCalculator} />
+      <Route path="/tools/auto-loan-calculator" component={AutoLoanCalculator} />
+      <Route path="/tools/auto-refi-calculator" component={AutoRefiCalculator} />
+      <Route path="/tools/savings-goal-calculator" component={SavingsGoalCalculator} />
+      <Route path="/tools/savings-comparison-calculator" component={SavingsComparisonCalculator} />
+      <Route path="/tools/cd-calculator" component={CDCalculator} />
+      <Route path="/tools/personal-loan-calculator" component={PersonalLoanCalculator} />
+      <Route path="/tools/loan-comparison-calculator" component={LoanComparisonCalculator} />
+      <Route path="/tools/debt-consolidation-calculator" component={DebtConsolidationCalculator} />
+      <Route path="/tools/debt-payoff-calculator" component={DebtPayoffCalculator} />
+      <Route path="/tools/credit-card-payoff-calculator" component={CreditCardPayoffCalculator} />
+      <Route path="/tools/credit-card-interest-calculator" component={CreditCardInterestCalculator} />
+      <Route path="/tools/credit-card-refi-calculator" component={CreditCardRefiCalculator} />
+      <Route path="/tools/balance-transfer-calculator" component={BalanceTransferCalculator} />
+      <Route path="/tools/apr-apy-converter" component={AprApyConverter} />
+      <Route path="/tools/dti-calculator" component={DTICalculator} />
 
       {/* About page */}
       <Route path="/about" component={AboutPage} />
