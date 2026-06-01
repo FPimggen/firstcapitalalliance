@@ -150,9 +150,17 @@ export default function HomePage() {
                 <div key={offer.id} className="card-premium p-5 flex flex-col">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[var(--navy-100)] flex items-center justify-center text-xs font-bold text-[var(--navy-700)] uppercase shrink-0">
-                        {provider?.name.slice(0, 2) ?? "??"}
-                      </div>
+                      {(offer as any).imageUrl || provider?.logoUrl ? (
+                        <img
+                          src={(offer as any).imageUrl || provider?.logoUrl}
+                          alt={offer.productName}
+                          className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-[var(--navy-100)] flex items-center justify-center text-xs font-bold text-[var(--navy-700)] uppercase shrink-0">
+                          {provider?.name.slice(0, 2) ?? "??"}
+                        </div>
+                      )}
                       <div>
                         <div className="font-semibold text-sm text-foreground">{offer.productName}</div>
                         <div className="text-xs text-muted-foreground">{provider?.name}</div>

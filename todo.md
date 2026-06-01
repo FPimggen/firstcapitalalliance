@@ -102,7 +102,7 @@
 - [ ] Email notification for stale offers
 
 ## New Consumer Resources
-- [ ] Credit score education hub (/credit-score) with overview, ranges, factors, improvement tips, and score-by-product guides
-- [ ] Financial glossary (/glossary) with alphabetical index and individual term pages (/glossary/[term])
-- [ ] Credit card comparison tool (/compare/credit-cards) — side-by-side comparison of 2–3 selected cards
-- [ ] Nav links updated for all three new sections
+- [x] Credit score education hub (/credit-score) with overview, ranges, factors, improvement tips, and score-by-product guides
+- [x] Financial glossary (/glossary) with alphabetical index and individual term pages (/glossary/[term])
+- [x] Credit card comparison tool (/compare/credit-cards) — side-by-side comparison of 2–3 selected cards
+- [x] Nav links updated for all three new sections

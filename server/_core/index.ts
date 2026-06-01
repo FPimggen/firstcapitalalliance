@@ -9,6 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleOfferAudit, handleSitemap } from "../scheduledHandlers";
+import { handleImageUpload } from "../uploadHandler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -40,6 +41,8 @@ async function startServer() {
   // Sitemap
   app.get("/sitemap.xml", handleSitemap);
 
+  // Image upload endpoint (admin only)
+  app.post("/api/upload/image", handleImageUpload);
   // Scheduled heartbeat endpoints
   app.post("/api/scheduled/offer-audit", handleOfferAudit);
 

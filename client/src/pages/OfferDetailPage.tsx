@@ -82,9 +82,17 @@ export default function OfferDetailPage() {
             { label: offer.productName },
           ]} />
           <div className="flex flex-col sm:flex-row sm:items-start gap-5 mt-5">
-            <div className="w-16 h-16 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase shrink-0">
-              {provider?.name.slice(0, 2) ?? "??"}
-            </div>
+            {(offer as any).imageUrl || provider?.logoUrl ? (
+              <img
+                src={(offer as any).imageUrl || provider?.logoUrl}
+                alt={offer.productName}
+                className="w-16 h-16 rounded-xl object-contain bg-muted border border-border shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase shrink-0">
+                {provider?.name.slice(0, 2) ?? "??"}
+              </div>
+            )}
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h1 className="text-2xl lg:text-3xl font-serif font-semibold text-foreground">{offer.productName}</h1>
@@ -243,9 +251,17 @@ export default function OfferDetailPage() {
           <div className="space-y-5">
             {/* CTA card */}
             <div className="card-premium p-6 text-center">
-              <div className="w-14 h-14 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase mx-auto mb-3">
-                {provider?.name.slice(0, 2) ?? "??"}
-              </div>
+              {(offer as any).imageUrl || provider?.logoUrl ? (
+                <img
+                  src={(offer as any).imageUrl || provider?.logoUrl}
+                  alt={offer.productName}
+                  className="w-14 h-14 rounded-xl object-contain bg-muted border border-border mx-auto mb-3"
+                />
+              ) : (
+                <div className="w-14 h-14 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase mx-auto mb-3">
+                  {provider?.name.slice(0, 2) ?? "??"}
+                </div>
+              )}
               <div className="font-semibold text-foreground mb-1">{offer.productName}</div>
               <div className="text-xs text-muted-foreground mb-4">by {provider?.name}</div>
               {rating && <StarRating rating={rating} />}

@@ -171,12 +171,6 @@ export function PublicNav() {
           {/* Right actions */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
-              href="/admin"
-              className="text-sm font-medium text-white/60 hover:text-white transition-colors"
-            >
-              Admin
-            </Link>
-            <Link
               href="/credit-cards"
               className="btn-cta text-sm px-4 py-2"
             >

@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, CheckCircle2, AlertTriangle, Clock, Star, Sparkles } from "lucide-react";
+import { ImageUpload } from "@/components/ImageUpload";
 
 type OfferForm = {
   productName: string;
@@ -25,6 +26,7 @@ type OfferForm = {
   bonusDetails: string;
   minCreditScore: string;
   overallRating: string;
+  imageUrl: string;
   trackingUrl: string;
   editorialSummary: string;
   pros: string;
@@ -36,7 +38,7 @@ type OfferForm = {
 const EMPTY_FORM: OfferForm = {
   productName: "", tagline: "", providerId: "", categoryId: "", slug: "",
   aprMin: "", aprMax: "", annualFee: "", rewardsRate: "", bonusDetails: "",
-  minCreditScore: "", overallRating: "", trackingUrl: "", editorialSummary: "",
+  minCreditScore: "", overallRating: "", imageUrl: "", trackingUrl: "", editorialSummary: "",
   pros: "", cons: "", isFeatured: false, isActive: true,
 };
 
@@ -76,6 +78,7 @@ export default function AdminOffers() {
       bonusDetails: offer.offer.bonusDetails ?? "",
       minCreditScore: offer.offer.minCreditScore ? String(offer.offer.minCreditScore) : "",
       overallRating: offer.offer.overallRating ?? "",
+      imageUrl: offer.offer.imageUrl ?? "",
       trackingUrl: offer.offer.trackingUrl ?? "",
       editorialSummary: offer.offer.editorialSummary ?? "",
       pros: (offer.offer.pros ?? []).join("\n"),
@@ -102,6 +105,7 @@ export default function AdminOffers() {
         bonusDetails: form.bonusDetails || undefined,
         minCreditScore: form.minCreditScore ? parseInt(form.minCreditScore) : undefined,
         overallRating: form.overallRating || undefined,
+        imageUrl: form.imageUrl || undefined,
         trackingUrl: form.trackingUrl || undefined,
         editorialSummary: form.editorialSummary || undefined,
         pros: form.pros ? form.pros.split("\n").filter(Boolean) : undefined,
@@ -314,6 +318,14 @@ export default function AdminOffers() {
             <div>
               <Label>Tracking / Apply URL</Label>
               <Input value={form.trackingUrl} onChange={(e) => setForm((f) => ({ ...f, trackingUrl: e.target.value }))} placeholder="https://..." />
+            </div>
+            <div className="col-span-2">
+              <ImageUpload
+                label="Offer Image"
+                hint="Optional. If not set, the provider logo will be used. Accepts PNG, JPG, WebP up to 5 MB."
+                value={form.imageUrl || null}
+                onChange={(url) => setForm((f) => ({ ...f, imageUrl: url ?? "" }))}
+              />
             </div>
             <div className="col-span-2">
               <Label>Rewards Rate</Label>

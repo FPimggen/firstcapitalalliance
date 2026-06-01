@@ -10,16 +10,17 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Globe, MapPin } from "lucide-react";
+import { ImageUpload } from "@/components/ImageUpload";
 
 type ProviderForm = {
   name: string; slug: string; description: string; editorialSummary: string;
   websiteUrl: string; headquarters: string; foundedYear: string;
-  overallRating: string; isActive: boolean;
+  overallRating: string; logoUrl: string; isActive: boolean;
 };
 
 const EMPTY: ProviderForm = {
   name: "", slug: "", description: "", editorialSummary: "", websiteUrl: "",
-  headquarters: "", foundedYear: "", overallRating: "", isActive: true,
+  headquarters: "", foundedYear: "", overallRating: "", logoUrl: "", isActive: true,
 };
 
 function slugify(s: string) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
@@ -41,7 +42,7 @@ export default function AdminProviders() {
       name: p.name ?? "", slug: p.slug ?? "", description: p.description ?? "",
       editorialSummary: p.editorialSummary ?? "", websiteUrl: p.websiteUrl ?? "",
       headquarters: p.headquarters ?? "", foundedYear: p.foundedYear ? String(p.foundedYear) : "",
-      overallRating: p.overallRating ?? "", isActive: p.isActive ?? true,
+      overallRating: p.overallRating ?? "", logoUrl: p.logoUrl ?? "", isActive: p.isActive ?? true,
     });
     setEditId(p.id); setOpen(true);
   };
@@ -54,6 +55,7 @@ export default function AdminProviders() {
         websiteUrl: form.websiteUrl || undefined, headquarters: form.headquarters || undefined,
         foundedYear: form.foundedYear ? parseInt(form.foundedYear) : undefined,
         overallRating: form.overallRating || undefined,
+        logoUrl: form.logoUrl || undefined,
       };
       if (editId) { await updateMutation.mutateAsync({ id: editId, data: { ...payload, isActive: form.isActive } }); toast.success("Provider updated"); }
       else { await createMutation.mutateAsync(payload); toast.success("Provider created"); }
@@ -86,7 +88,11 @@ export default function AdminProviders() {
             <div key={p.id} className="card-premium p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[var(--navy-100)] flex items-center justify-center text-xs font-bold text-[var(--navy-700)] uppercase">{p.name.slice(0, 2)}</div>
+                  {p.logoUrl ? (
+                    <img src={p.logoUrl} alt={p.name} className="w-9 h-9 rounded-lg object-contain bg-muted border border-border" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-lg bg-[var(--navy-100)] flex items-center justify-center text-xs font-bold text-[var(--navy-700)] uppercase">{p.name.slice(0, 2)}</div>
+                  )}
                   <div>
                     <div className="font-semibold text-sm text-foreground">{p.name}</div>
                     {p.overallRating && <div className="text-xs text-muted-foreground">Rating: {parseFloat(p.overallRating).toFixed(1)}/5</div>}
@@ -117,6 +123,14 @@ export default function AdminProviders() {
             <div><Label>Website URL</Label><Input value={form.websiteUrl} onChange={(e) => setForm((f) => ({ ...f, websiteUrl: e.target.value }))} placeholder="https://..." /></div>
             <div><Label>Headquarters</Label><Input value={form.headquarters} onChange={(e) => setForm((f) => ({ ...f, headquarters: e.target.value }))} placeholder="New York, NY" /></div>
             <div className="col-span-2"><Label>Founded Year</Label><Input value={form.foundedYear} onChange={(e) => setForm((f) => ({ ...f, foundedYear: e.target.value }))} placeholder="1990" /></div>
+            <div className="col-span-2">
+              <ImageUpload
+                label="Provider Logo"
+                hint="Optional. Used as the fallback image for all offers from this provider. PNG, JPG, WebP up to 5 MB."
+                value={form.logoUrl || null}
+                onChange={(url) => setForm((f) => ({ ...f, logoUrl: url ?? "" }))}
+              />
+            </div>
             <div className="col-span-2"><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={2} /></div>
             <div className="col-span-2"><Label>Editorial Summary</Label><Textarea value={form.editorialSummary} onChange={(e) => setForm((f) => ({ ...f, editorialSummary: e.target.value }))} rows={3} /></div>
             <div className="flex items-center gap-3"><Switch checked={form.isActive} onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))} /><Label>Active</Label></div>

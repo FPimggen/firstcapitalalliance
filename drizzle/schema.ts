@@ -90,6 +90,7 @@ export const offers = mysqlTable(
     cons: json("cons").$type<string[]>(),
     editorialSummary: text("editorialSummary"),
     overallRating: decimal("overallRating", { precision: 3, scale: 1 }),
+    imageUrl: text("imageUrl"),
     trackingUrl: text("trackingUrl"),
     source: varchar("source", { length: 64 }).default("manual"),
     sourceId: varchar("sourceId", { length: 128 }),

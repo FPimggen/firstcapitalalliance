@@ -56,9 +56,17 @@ export default function ProviderPage() {
         <div className="container py-8">
           <Breadcrumb items={[{ label: "Providers", href: "/providers" }, { label: provider.name }]} />
           <div className="flex items-start gap-5 mt-5">
-            <div className="w-16 h-16 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase shrink-0">
-              {provider.name.slice(0, 2)}
-            </div>
+            {provider.logoUrl ? (
+              <img
+                src={provider.logoUrl}
+                alt={provider.name}
+                className="w-16 h-16 rounded-xl object-contain bg-muted border border-border shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase shrink-0">
+                {provider.name.slice(0, 2)}
+              </div>
+            )}
             <div>
               <h1 className="text-3xl font-serif font-semibold text-foreground mb-2">{provider.name}</h1>
               {rating && (

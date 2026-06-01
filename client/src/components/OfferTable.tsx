@@ -201,9 +201,17 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
               <tr key={offer.id} className={`hover:bg-muted/30 transition-colors ${offer.isFeatured ? "bg-[var(--teal-50)]" : "bg-card"}`}>
                 <td className="px-5 py-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 text-xs font-bold text-muted-foreground uppercase">
-                      {provider?.name.slice(0, 2) ?? "??"}
-                    </div>
+                    {(offer as any).imageUrl || provider?.logoUrl ? (
+                      <img
+                        src={(offer as any).imageUrl || provider?.logoUrl}
+                        alt={offer.productName}
+                        className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 text-xs font-bold text-muted-foreground uppercase">
+                        {provider?.name.slice(0, 2) ?? "??"}
+                      </div>
+                    )}
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-foreground">{offer.productName}</span>
@@ -271,9 +279,17 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
           <div key={offer.id} className={`card-premium p-4 ${offer.isFeatured ? "border-[var(--teal-400)] bg-[var(--teal-50)]" : ""}`}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 text-xs font-bold text-muted-foreground uppercase">
-                  {provider?.name.slice(0, 2) ?? "??"}
-                </div>
+                {(offer as any).imageUrl || provider?.logoUrl ? (
+                  <img
+                    src={(offer as any).imageUrl || provider?.logoUrl}
+                    alt={offer.productName}
+                    className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 text-xs font-bold text-muted-foreground uppercase">
+                    {provider?.name.slice(0, 2) ?? "??"}
+                  </div>
+                )}
                 <div>
                   <div className="font-semibold text-foreground text-sm">{offer.productName}</div>
                   <div className="text-xs text-muted-foreground">{provider?.name}</div>
