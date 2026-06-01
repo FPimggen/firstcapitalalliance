@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -34,6 +35,14 @@ import { CreditCardPayoffCalculator, CreditCardInterestCalculator, CreditCardRef
 import { AprApyConverter, DTICalculator } from "./pages/tools/GeneralCalculators";
 import AdminArticles from "./pages/admin/AdminArticles";
 
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [location]);
+  return null;
+}
+
 function AdminRoute({ component: Component }: { component: React.ComponentType }) {
   return (
     <AdminLayout>
@@ -44,7 +53,9 @@ function AdminRoute({ component: Component }: { component: React.ComponentType }
 
 function Router() {
   return (
-    <Switch>
+    <>
+      <ScrollToTop />
+      <Switch>
       {/* Public pages */}
       <Route path="/" component={Home} />
       <Route path="/providers" component={ProvidersIndex} />
@@ -108,6 +119,7 @@ function Router() {
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
+    </>
   );
 }
 

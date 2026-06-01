@@ -71,6 +71,30 @@
 - [x] TypeScript: zero errors
 - [x] Checkpoint and deliver
 
+## Calculator Tools
+- [x] Calculator hub page (/tools) with all 19 calculators categorized
+- [x] Mortgage Payment Calculator
+- [x] Mortgage Refinance Calculator (break-even analysis)
+- [x] Home Affordability Calculator
+- [x] Rent vs. Buy Calculator
+- [x] Auto Loan Calculator
+- [x] Auto Refinance Calculator (savings comparison)
+- [x] Credit Card Payoff Calculator
+- [x] Credit Card Interest Calculator (minimum payment)
+- [x] Credit Card Refinance Calculator
+- [x] Balance Transfer Calculator
+- [x] Personal Loan Calculator
+- [x] Loan Comparison Calculator (side-by-side)
+- [x] Debt Consolidation Calculator
+- [x] Debt Payoff Calculator (avalanche vs snowball)
+- [x] Savings Goal Calculator
+- [x] High-Yield vs Regular Savings Comparison
+- [x] CD Calculator
+- [x] APR vs APY Converter
+- [x] Debt-to-Income (DTI) Calculator
+- [x] Tools nav link with dropdown in PublicLayout
+- [x] All 19 calculator routes registered in App.tsx
+
 ## Future / Pending
 - [ ] Register heartbeat cron for offer-audit after first deploy (requires deployed URL)
 - [ ] Flex Offers API integration
