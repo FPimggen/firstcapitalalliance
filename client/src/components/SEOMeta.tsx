@@ -44,6 +44,7 @@ export default function SEOMeta({
     };
 
     setMeta('meta[name="description"]', "content", description);
+    setMeta('meta[name="fo-verify"]', "content", "6d6b8575-b49b-452b-bebe-72dc20d8096c");
     setMeta('meta[name="robots"]', "content", noindex ? "noindex,nofollow" : "index,follow");
 
     // Open Graph
