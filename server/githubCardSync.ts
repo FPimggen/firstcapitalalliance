@@ -13,7 +13,6 @@
  *              all changes.
  */
 
-import { execSync } from "child_process";
 import * as fs from "fs";
 import * as https from "https";
 import { invokeLLM } from "./_core/llm";
@@ -23,7 +22,6 @@ import { ENV } from "./_core/env";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const USER_ENV_PATH = "/home/ubuntu/.user_env";
-const GWS_BIN = "/home/ubuntu/.local/share/pnpm/bin/gws";
 
 function getFreshGoogleToken(): string {
   try {
@@ -38,15 +36,36 @@ function getFreshGoogleToken(): string {
   throw new Error("No Google OAuth token available");
 }
 
-function gwsExec(params: object): unknown {
-  const freshToken = getFreshGoogleToken();
-  const cmd = `${GWS_BIN} sheets spreadsheets values batchGet --params ${JSON.stringify(JSON.stringify(params))}`;
-  const stdout = execSync(cmd, {
-    encoding: "utf8",
-    timeout: 60000,
-    env: { ...process.env, GOOGLE_WORKSPACE_CLI_TOKEN: freshToken },
+/** Direct HTTPS batchGet — no shell arg limits, always uses fresh token */
+function gwsBatchGet(
+  spreadsheetId: string,
+  ranges: string[]
+): Promise<{ valueRanges: { range: string; values: string[][] }[] }> {
+  return new Promise((resolve, reject) => {
+    const freshToken = getFreshGoogleToken();
+    const query = ranges.map((r) => `ranges=${encodeURIComponent(r)}`).join("&");
+    const path = `/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values:batchGet?${query}&majorDimension=ROWS`;
+    const req = https.request(
+      { hostname: "sheets.googleapis.com", path, method: "GET", headers: { Authorization: `Bearer ${freshToken}` } },
+      (res) => {
+        let raw = "";
+        res.on("data", (c) => { raw += c; });
+        res.on("end", () => {
+          if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+            reject(new Error(`Sheets batchGet error ${res.statusCode}: ${raw.slice(0, 400)}`));
+            return;
+          }
+          try {
+            resolve(JSON.parse(raw) as { valueRanges: { range: string; values: string[][] }[] });
+          } catch (e) {
+            reject(new Error(`Sheets batchGet JSON parse error: ${String(e)}`));
+          }
+        });
+      }
+    );
+    req.on("error", reject);
+    req.end();
   });
-  return JSON.parse(stdout);
 }
 
 /**
@@ -254,10 +273,7 @@ async function phase1_githubToSheet(spreadsheetId: string): Promise<{
   console.log(`[GithubSync] Phase 1: Got ${githubCards.length} cards from GitHub`);
 
   // Fetch current sheet data (all rows including header)
-  const sheetResult = gwsExec({
-    spreadsheetId,
-    ranges: ["Credit Cards!A1:Y500"],
-  }) as { valueRanges: { range: string; values: string[][] }[] };
+  const sheetResult = await gwsBatchGet(spreadsheetId, ["Credit Cards!A1:Y500"]);
 
   const allRows: string[][] = sheetResult.valueRanges?.[0]?.values ?? [];
   const headerRow = allRows[0] ?? [];
@@ -394,10 +410,7 @@ async function phase2_llmFillBlanks(spreadsheetId: string): Promise<{ filled: nu
   console.log("[GithubSync] Phase 2: LLM content generation for blank fields...");
 
   // Re-fetch the sheet after Phase 1 writes
-  const sheetResult = gwsExec({
-    spreadsheetId,
-    ranges: ["Credit Cards!A1:Y500"],
-  }) as { valueRanges: { range: string; values: string[][] }[] };
+  const sheetResult = await gwsBatchGet(spreadsheetId, ["Credit Cards!A1:Y500"]);
 
   const allRows: string[][] = sheetResult.valueRanges?.[0]?.values ?? [];
   const dataRows = allRows.slice(1);
