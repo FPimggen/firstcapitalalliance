@@ -463,6 +463,25 @@ const trackingRouter = router({
 const sitemapRouter = router({
   data: publicProcedure.query(() => getSitemapData()),
   getLatestMeta: adminProcedure.query(() => getLatestSitemapMeta()),
+  getCronTaskUid: adminProcedure.query(() => getSitemapCronTaskUid()),
+  scheduleAutoRegen: adminProcedure.mutation(async ({ ctx }) => {
+    const cookieModule = await import("cookie");
+    const parseCookie = cookieModule.parse;
+    const sessionToken = parseCookie(ctx.req.headers.cookie ?? "")[COOKIE_NAME] ?? "";
+    if (!sessionToken) throw new TRPCError({ code: "UNAUTHORIZED", message: "No session cookie" });
+    const existingUid = await getSitemapCronTaskUid();
+    if (existingUid) return { taskUid: existingUid, alreadyExists: true };
+    const { createHeartbeatJob } = await import("./_core/heartbeat");
+    const job = await createHeartbeatJob({
+      name: "sitemap-regen-weekly",
+      cron: "0 0 3 * * 0",
+      path: "/api/scheduled/sitemap-regen",
+      description: "Weekly sitemap regeneration - First Capital Alliance",
+    }, sessionToken);
+    await recordSitemapGeneration({ urlCount: 0, triggeredBy: "scheduled", scheduleCronTaskUid: job.taskUid });
+    await addAuditLog({ action: "schedule_sitemap_regen", entityType: "system", triggeredBy: ctx.user.name ?? ctx.user.openId });
+    return { taskUid: job.taskUid, alreadyExists: false };
+  }),
   generate: adminProcedure.mutation(async ({ ctx }) => {
     const { cats, provs, offs, arts } = await getSitemapData();
     const baseUrl = "https://firstcapitalalliance.com";
