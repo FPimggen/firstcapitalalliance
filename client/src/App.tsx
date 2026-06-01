@@ -12,6 +12,7 @@ import ProvidersIndex from "./pages/ProvidersIndex";
 import ArticleHub from "./pages/ArticleHub";
 import ArticlePage from "./pages/ArticlePage";
 import StaticPage from "./pages/StaticPages";
+import AboutPage from "./pages/AboutPage";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOffers from "./pages/admin/AdminOffers";
@@ -48,6 +49,9 @@ function Router() {
 
       {/* Product detail pages */}
       <Route path="/offers/:slug" component={OfferDetailPage} />
+
+      {/* About page */}
+      <Route path="/about" component={AboutPage} />
 
       {/* Static trust pages */}
       <Route path="/disclosure">{() => <StaticPage path="/disclosure" />}</Route>
