@@ -137,19 +137,19 @@
 
 ## Launch Readiness Pass
 
-- [ ] Fix navigation: add Banking section (Checking, Savings, CDs), restructure Compare Now button
-- [ ] Fix footer: add /privacy, /terms routes; fix /compare link; add Checking/Savings/CDs to Products list
-- [ ] Build HELOC page (/mortgages/heloc)
-- [ ] Build Checking Accounts page (/checking-accounts)
-- [ ] Build CDs page (/cds)
-- [ ] Add /mortgages/refinance route
-- [ ] Build /compare hub page
-- [ ] Add /privacy and /terms static pages
-- [ ] Fix offer image display: remove rounded container box, show raw card image
-- [ ] Fix comparison tools: product name prominent, provider as subtitle
-- [ ] Fix MortgageCalculator: auto-hide/disable PMI when down payment >= 20%
-- [ ] Overhaul SavingsGoalCalculator to be intuitive and useful
-- [ ] Add dynamic contextual tool injection on offer detail pages
-- [ ] Add CDs category to sheetsSync and seed CD category in DB
-- [ ] Add checking-accounts, cds routes to App.tsx with ComparisonPage
-- [ ] Add category metadata for checking-accounts and cds in ComparisonPage
+- [x] Fix navigation: add Banking section (Checking, Savings, CDs), restructure Compare Now button
+- [x] Fix footer: add /privacy, /terms routes; fix /compare link; add Checking/Savings/CDs to Products list
+- [x] Build HELOC page (/mortgages/heloc)
+- [x] Build Checking Accounts page (/checking-accounts)
+- [x] Build CDs page (/cds)
+- [x] Add /mortgages/refinance route
+- [x] Build /compare hub page
+- [x] Add /privacy and /terms static pages
+- [x] Fix offer image display: remove rounded container box, show raw card image
+- [x] Fix comparison tools: product name prominent, provider as subtitle
+- [x] Fix MortgageCalculator: auto-hide/disable PMI when down payment >= 20%
+- [x] Overhaul SavingsGoalCalculator to be intuitive and useful
+- [x] Add dynamic contextual tool injection on offer detail pages
+- [x] Add CDs category to sheetsSync and seed CD category in DB
+- [x] Add checking-accounts, cds routes to App.tsx with ComparisonPage
+- [x] Add category metadata for checking-accounts and cds in ComparisonPage

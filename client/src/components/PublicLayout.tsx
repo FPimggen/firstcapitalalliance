@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, Shield } from "lucide-react";
 
@@ -110,8 +110,24 @@ export function DisclosureBanner() {
 export function PublicNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [location] = useLocation();
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  const closeMobile = () => {
+    setMobileOpen(false);
+    setMobileExpanded(null);
+  };
 
   const openDropdown = (href: string) => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -182,53 +198,81 @@ export function PublicNav() {
 
           {/* Mobile toggle */}
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileOpen
+              ? <X className="w-5 h-5 text-white" />
+              : <Menu className="w-5 h-5 text-white" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — full-screen overlay with scroll */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-border bg-card">
-          <div className="container py-4 space-y-1">
-            {NAV_LINKS.map((link) => (
-              <div key={link.href}>
-                <Link
-                  href={link.href}
-                  className="block px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted hover:text-accent transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {link.label}
-                </Link>
-                {link.children && (
-                  <div className="ml-4 mt-1 space-y-1">
-                    {link.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className="block px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-accent hover:bg-muted transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
+        <div className="lg:hidden fixed inset-0 z-50 bg-[var(--navy-950)] flex flex-col">
+          {/* Mobile menu header */}
+          <div className="shrink-0 flex items-center justify-between px-4 h-16 border-b border-white/10">
+            <Link href="/" onClick={closeMobile}>
+              <img src={LOGO_HORIZONTAL_WHITE} alt="First Capital Alliance" className="h-8 w-auto object-contain" />
+            </Link>
+            <button
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMobile}
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            <div className="px-4 py-4 space-y-1 pb-8">
+              {NAV_LINKS.map((link) => {
+                const isExpanded = mobileExpanded === link.href;
+                return (
+                  <div key={link.href} className="border-b border-white/10 last:border-0">
+                    {/* Section header row */}
+                    <button
+                      className="w-full flex items-center justify-between px-2 py-3.5 text-left"
+                      onClick={() => setMobileExpanded(isExpanded ? null : link.href)}
+                    >
+                      <span className="text-white font-semibold text-base">{link.label}</span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-white/60 transition-transform duration-200 ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {/* Collapsible children */}
+                    {isExpanded && link.children && (
+                      <div className="pb-2 space-y-0.5">
+                        {link.children.map((child) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className="flex items-center gap-2 pl-5 pr-2 py-2.5 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                            onClick={closeMobile}
+                          >
+                            <span className="w-1 h-1 rounded-full bg-[var(--teal-400)] shrink-0" />
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
-            <div className="pt-3 border-t border-border">
-              <Link
-                href="/compare/credit-cards"
-                className="btn-cta w-full justify-center"
-                onClick={() => setMobileOpen(false)}
-              >
-                Compare Cards
-              </Link>
+                );
+              })}
             </div>
+          </div>
+          {/* Sticky CTA at bottom */}
+          <div className="shrink-0 px-4 py-4 border-t border-white/10 bg-[var(--navy-950)]">
+            <Link
+              href="/compare/credit-cards"
+              className="btn-cta w-full justify-center text-center block"
+              onClick={closeMobile}
+            >
+              Compare Cards
+            </Link>
           </div>
         </div>
       )}
