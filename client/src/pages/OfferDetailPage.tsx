@@ -110,7 +110,7 @@ export default function OfferDetailPage() {
               <img
                 src={provider.logoUrl}
                 alt={provider.name}
-                className="w-16 h-16 rounded-xl object-contain bg-muted border border-border shrink-0"
+                className="w-24 h-16 object-contain shrink-0"
               />
             ) : (
               <div className="w-16 h-16 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase shrink-0">
@@ -300,7 +300,7 @@ export default function OfferDetailPage() {
                 <img
                   src={provider.logoUrl}
                   alt={provider.name}
-                  className="w-14 h-14 rounded-xl object-contain bg-muted border border-border mx-auto mb-3"
+                  className="w-32 h-20 object-contain mx-auto mb-3"
                 />
               ) : (
                 <div className="w-14 h-14 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase mx-auto mb-3">

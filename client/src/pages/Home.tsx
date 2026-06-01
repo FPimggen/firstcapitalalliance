@@ -154,7 +154,7 @@ export default function HomePage() {
                         <img
                           src={(offer as any).imageUrl || provider?.logoUrl}
                           alt={offer.productName}
-                          className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
+                          className="w-16 h-10 object-contain shrink-0"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-lg bg-[var(--navy-100)] flex items-center justify-center text-xs font-bold text-[var(--navy-700)] uppercase shrink-0">

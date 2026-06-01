@@ -219,7 +219,7 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
                       <img
                         src={provider.logoUrl}
                         alt={provider.name}
-                        className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
+                        className="w-16 h-10 object-contain shrink-0"
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 text-xs font-bold text-muted-foreground uppercase">
@@ -304,7 +304,7 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
                   <img
                     src={provider.logoUrl}
                     alt={provider.name}
-                    className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
+                    className="w-16 h-10 object-contain shrink-0"
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 text-xs font-bold text-muted-foreground uppercase">

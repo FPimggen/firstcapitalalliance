@@ -60,7 +60,7 @@ export default function ProviderPage() {
               <img
                 src={provider.logoUrl}
                 alt={provider.name}
-                className="w-16 h-16 rounded-xl object-contain bg-muted border border-border shrink-0"
+                className="w-24 h-16 object-contain shrink-0"
               />
             ) : (
               <div className="w-16 h-16 rounded-xl bg-[var(--navy-100)] flex items-center justify-center text-xl font-bold text-[var(--navy-700)] uppercase shrink-0">

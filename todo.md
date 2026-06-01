@@ -166,3 +166,11 @@
 - [x] Register 7-day heartbeat cron via manus-heartbeat CLI (after deploy) — button in admin dashboard
 - [x] Add admin dashboard: Offer Analytics tab (views + clicks table, sortable)
 - [x] Add admin dashboard: Sitemap panel (last generated, manual regenerate button)
+
+## Provider Logo Display Fix
+
+- [x] Remove bg-muted/border/rounded container styling from OfferTable.tsx (desktop + mobile logo rows)
+- [x] Remove bg-muted/border/rounded container styling from OfferDetailPage.tsx (header + sidebar)
+- [x] Remove bg-muted/border/rounded container styling from ProviderPage.tsx (header)
+- [x] Remove bg-muted/border/rounded container styling from Home.tsx (featured offers section)
+- [x] Verified 0 remaining instances of `bg-muted border border-border` on logo images across all .tsx files
