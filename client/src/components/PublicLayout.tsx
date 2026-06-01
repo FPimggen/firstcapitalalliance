@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, Shield } from "lucide-react";
 
+const LOGO_HORIZONTAL_WHITE = "/manus-storage/logo-horizontal-white_7e0d1f33.png";
+const LOGO_HORIZONTAL_BLACK = "/manus-storage/logo-horizontal-black_bf04384f.png";
+
 const NAV_LINKS = [
   {
     label: "Credit Cards",
@@ -72,17 +75,16 @@ export function PublicNav() {
   const [location] = useLocation();
 
   return (
-    <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-sm border-b border-border">
+    <header className="sticky top-0 z-40 bg-[var(--navy-950)] backdrop-blur-sm border-b border-[var(--navy-800)]">
       <div className="container">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-[var(--navy-900)] flex items-center justify-center">
-              <Shield className="w-4 h-4 text-[var(--teal-400)]" />
-            </div>
-            <span className="font-serif font-semibold text-lg text-foreground tracking-tight">
-              First Capital Alliance
-            </span>
+          <Link href="/" className="flex items-center shrink-0">
+            <img
+              src={LOGO_HORIZONTAL_WHITE}
+              alt="First Capital Alliance"
+              className="h-9 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -98,12 +100,12 @@ export function PublicNav() {
                   href={link.href}
                   className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     location.startsWith(link.href) && link.href !== "/"
-                      ? "text-accent bg-[var(--teal-50)]"
-                      : "text-foreground hover:text-accent hover:bg-muted"
+                      ? "text-[var(--teal-300)] bg-white/10"
+                      : "text-white/90 hover:text-white hover:bg-white/10"
                   }`}
                 >
-                  {link.label}
-                  {link.children && <ChevronDown className="w-3.5 h-3.5 opacity-60" />}
+                  <span className="text-white/90">{link.label}</span>
+                  {link.children && <ChevronDown className="w-3.5 h-3.5 text-white/60" />}
                 </Link>
                 {link.children && activeDropdown === link.href && (
                   <DropdownMenu items={link.children} />
@@ -116,7 +118,7 @@ export function PublicNav() {
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/admin"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-medium text-white/60 hover:text-white transition-colors"
             >
               Admin
             </Link>
@@ -192,13 +194,14 @@ export function PublicFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[var(--navy-800)] flex items-center justify-center">
-                <Shield className="w-4 h-4 text-[var(--teal-400)]" />
-              </div>
-              <span className="font-serif font-semibold text-lg text-white tracking-tight">
-                First Capital Alliance
-              </span>
+            <div className="mb-5">
+              <Link href="/">
+                <img
+                  src={LOGO_HORIZONTAL_WHITE}
+                  alt="First Capital Alliance"
+                  className="h-10 w-auto object-contain"
+                />
+              </Link>
             </div>
             <p className="text-sm leading-relaxed text-[oklch(65%_0.02_250)] max-w-xs">
               An independent financial comparison platform helping consumers make informed decisions about credit cards, loans, and mortgages.
