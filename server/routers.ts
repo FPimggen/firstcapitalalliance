@@ -29,6 +29,7 @@ import {
   getOfferBySlug,
   getOffersByCategory,
   getOffersByCategorySlug,
+  getOffersByCardType,
   getOffersByProvider,
   getProviderBySlug,
   getProviders,
@@ -153,8 +154,11 @@ const providersRouter = router({
 // ─── Offers router ────────────────────────────────────────────────────────────
 const offersRouter = router({
   byCategory: publicProcedure
-    .input(z.object({ categorySlug: z.string() }))
-    .query(({ input }) => getOffersByCategorySlug(input.categorySlug)),
+    .input(z.object({ categorySlug: z.string(), cardType: z.string().optional() }))
+    .query(({ input }) => getOffersByCategorySlug(input.categorySlug, input.cardType)),
+  byCardType: publicProcedure
+    .input(z.object({ cardType: z.enum(["cash-back", "travel", "balance-transfer", "credit-builder", "general"]) }))
+    .query(({ input }) => getOffersByCardType(input.cardType)),
   bySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input }) => {
@@ -187,6 +191,7 @@ const offersRouter = router({
       cons: z.array(z.string()).optional(),
       editorialSummary: z.string().optional(),
       overallRating: z.string().optional(),
+      cardType: z.enum(["cash-back", "travel", "balance-transfer", "credit-builder", "general"]).optional(),
       imageUrl: z.string().optional(),
       trackingUrl: z.string().optional(),
       isFeatured: z.boolean().optional(),
@@ -214,6 +219,7 @@ const offersRouter = router({
         cons: z.array(z.string()).optional(),
         editorialSummary: z.string().optional(),
         overallRating: z.string().optional(),
+        cardType: z.enum(["cash-back", "travel", "balance-transfer", "credit-builder", "general"]).optional(),
         imageUrl: z.string().optional(),
         trackingUrl: z.string().optional(),
         isFeatured: z.boolean().optional(),

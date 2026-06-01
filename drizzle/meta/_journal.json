@@ -15,6 +15,13 @@
       "when": 1780267594502,
       "tag": "0001_colorful_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1780290339213,
+      "tag": "0002_jazzy_madame_masque",
+      "breakpoints": true
     }
   ]
 }

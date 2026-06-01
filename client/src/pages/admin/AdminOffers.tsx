@@ -26,6 +26,7 @@ type OfferForm = {
   bonusDetails: string;
   minCreditScore: string;
   overallRating: string;
+  cardType: string;
   imageUrl: string;
   trackingUrl: string;
   editorialSummary: string;
@@ -38,7 +39,7 @@ type OfferForm = {
 const EMPTY_FORM: OfferForm = {
   productName: "", tagline: "", providerId: "", categoryId: "", slug: "",
   aprMin: "", aprMax: "", annualFee: "", rewardsRate: "", bonusDetails: "",
-  minCreditScore: "", overallRating: "", imageUrl: "", trackingUrl: "", editorialSummary: "",
+  minCreditScore: "", overallRating: "", cardType: "general", imageUrl: "", trackingUrl: "", editorialSummary: "",
   pros: "", cons: "", isFeatured: false, isActive: true,
 };
 
@@ -78,6 +79,7 @@ export default function AdminOffers() {
       bonusDetails: offer.offer.bonusDetails ?? "",
       minCreditScore: offer.offer.minCreditScore ? String(offer.offer.minCreditScore) : "",
       overallRating: offer.offer.overallRating ?? "",
+      cardType: offer.offer.cardType ?? "general",
       imageUrl: offer.offer.imageUrl ?? "",
       trackingUrl: offer.offer.trackingUrl ?? "",
       editorialSummary: offer.offer.editorialSummary ?? "",
@@ -105,6 +107,7 @@ export default function AdminOffers() {
         bonusDetails: form.bonusDetails || undefined,
         minCreditScore: form.minCreditScore ? parseInt(form.minCreditScore) : undefined,
         overallRating: form.overallRating || undefined,
+        cardType: (form.cardType && form.cardType !== "general" ? form.cardType : undefined) as any,
         imageUrl: form.imageUrl || undefined,
         trackingUrl: form.trackingUrl || undefined,
         editorialSummary: form.editorialSummary || undefined,
@@ -295,6 +298,21 @@ export default function AdminOffers() {
                 </SelectContent>
               </Select>
             </div>
+            {(categories ?? []).find((c) => String(c.id) === form.categoryId)?.slug === "credit-cards" && (
+              <div>
+                <Label>Card Type</Label>
+                <Select value={form.cardType} onValueChange={(v) => setForm((f) => ({ ...f, cardType: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Select card type" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash-back">Cash Back</SelectItem>
+                    <SelectItem value="travel">Travel</SelectItem>
+                    <SelectItem value="balance-transfer">Balance Transfer</SelectItem>
+                    <SelectItem value="credit-builder">Credit Builder</SelectItem>
+                    <SelectItem value="general">General / Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div>
               <Label>APR Min (%)</Label>
               <Input value={form.aprMin} onChange={(e) => setForm((f) => ({ ...f, aprMin: e.target.value }))} placeholder="e.g. 19.99" />

@@ -95,6 +95,14 @@
 - [x] Tools nav link with dropdown in PublicLayout
 - [x] All 19 calculator routes registered in App.tsx
 
+## Image & Media
+- [x] Admin link removed from public nav (desktop + mobile)
+- [x] ImageUpload component (drag-and-drop, preview, S3 upload, 5MB limit)
+- [x] POST /api/upload/image endpoint (admin-auth protected)
+- [x] Offer image upload in AdminOffers form
+- [x] Provider logo upload in AdminProviders form
+- [x] Image fallback chain: offer.imageUrl → provider.logoUrl → initials (OfferTable, Home, OfferDetailPage, ProviderPage, AdminProviders)
+
 ## Future / Pending
 - [ ] Register heartbeat cron for offer-audit after first deploy (requires deployed URL)
 - [ ] Flex Offers API integration
@@ -106,3 +114,12 @@
 - [x] Financial glossary (/glossary) with alphabetical index and individual term pages (/glossary/[term])
 - [x] Credit card comparison tool (/compare/credit-cards) — side-by-side comparison of 2–3 selected cards
 - [x] Nav links updated for all three new sections
+
+## Credit Card Sub-Categories
+- [x] Seed 4 credit card sub-categories: cash-back, travel, balance-transfer, credit-builder
+- [x] Add cardType column to offers table (cash-back | travel | balance-transfer | credit-builder | general)
+- [x] Update admin offers form with Card Type selector (shown only when category = credit cards)
+- [x] Dedicated comparison pages for each sub-category (/credit-cards/cash-back, /travel, /balance-transfer, /credit-builder)
+- [x] Credit Cards nav dropdown updated with sub-category links
+- [x] getOffersByCardType db helper and byCardType tRPC procedure added
+- [x] Existing offers tagged with appropriate cardType values

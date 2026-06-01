@@ -169,12 +169,31 @@ export async function getOffersByCategory(categoryId: number, activeOnly = true)
     .orderBy(desc(offers.isFeatured), desc(offers.overallRating));
 }
 
-export async function getOffersByCategorySlug(categorySlug: string, activeOnly = true) {
+export async function getOffersByCategorySlug(categorySlug: string, cardType?: string) {
   const db = await getDb();
   if (!db) return [];
   const cat = await getCategoryBySlug(categorySlug);
   if (!cat) return [];
-  return getOffersByCategory(cat.id, activeOnly);
+  const conditions: ReturnType<typeof eq>[] = [eq(offers.categoryId, cat.id), eq(offers.isActive, true)];
+  if (cardType) conditions.push(eq(offers.cardType, cardType as any));
+  return db
+    .select({ offer: offers, provider: providers, category: categories })
+    .from(offers)
+    .leftJoin(providers, eq(offers.providerId, providers.id))
+    .leftJoin(categories, eq(offers.categoryId, categories.id))
+    .where(and(...conditions))
+    .orderBy(desc(offers.isFeatured), desc(offers.overallRating));
+}
+export async function getOffersByCardType(cardType: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({ offer: offers, provider: providers, category: categories })
+    .from(offers)
+    .leftJoin(providers, eq(offers.providerId, providers.id))
+    .leftJoin(categories, eq(offers.categoryId, categories.id))
+    .where(and(eq(offers.cardType, cardType as any), eq(offers.isActive, true)))
+    .orderBy(desc(offers.isFeatured), desc(offers.overallRating));
 }
 
 export async function getOfferBySlug(slug: string) {

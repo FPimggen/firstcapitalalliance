@@ -13,7 +13,7 @@ const NAV_LINKS = [
       { label: "Cash Back Cards", href: "/credit-cards/cash-back" },
       { label: "Travel Cards", href: "/credit-cards/travel" },
       { label: "Balance Transfer", href: "/credit-cards/balance-transfer" },
-      { label: "Build Credit", href: "/credit-cards/build-credit" },
+      { label: "Credit Builder", href: "/credit-cards/credit-builder" },
     ],
   },
   {

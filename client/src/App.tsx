@@ -37,6 +37,7 @@ import AdminArticles from "./pages/admin/AdminArticles";
 import { CreditScoreHubPage, CardsByScorePage, AutoLoansByScorePage, MortgagesByScorePage, PersonalLoansByScorePage } from "./pages/CreditScoreHub";
 import { GlossaryIndexPage, GlossaryTermPage } from "./pages/Glossary";
 import CreditCardCompareTool from "./pages/CreditCardCompareTool";
+import CreditCardSubCategoryPage from "./pages/CreditCardSubCategoryPage";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -65,6 +66,12 @@ function Router() {
       <Route path="/providers/:slug" component={ProviderPage} />
       <Route path="/learn" component={ArticleHub} />
       <Route path="/learn/:slug" component={ArticlePage} />
+
+      {/* Credit card sub-category pages */}
+      <Route path="/credit-cards/cash-back">{() => <CreditCardSubCategoryPage cardType="cash-back" />}</Route>
+      <Route path="/credit-cards/travel">{() => <CreditCardSubCategoryPage cardType="travel" />}</Route>
+      <Route path="/credit-cards/balance-transfer">{() => <CreditCardSubCategoryPage cardType="balance-transfer" />}</Route>
+      <Route path="/credit-cards/credit-builder">{() => <CreditCardSubCategoryPage cardType="credit-builder" />}</Route>
 
       {/* Category comparison pages */}
       <Route path="/credit-cards">{() => <ComparisonPage categorySlug="credit-cards" />}</Route>
