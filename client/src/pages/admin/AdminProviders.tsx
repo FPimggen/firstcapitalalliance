@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Globe, MapPin } from "lucide-react";
+import { Plus, Pencil, Trash2, Globe, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { ImageUpload } from "@/components/ImageUpload";
 
 type ProviderForm = {
@@ -23,12 +24,20 @@ const EMPTY: ProviderForm = {
   headquarters: "", foundedYear: "", overallRating: "", logoUrl: "", isActive: true,
 };
 
+type StatusFilter = "all" | "active" | "inactive";
+type SortKey = "az" | "za" | "rating-desc" | "rating-asc" | "newest" | "oldest";
+
 function slugify(s: string) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
 
 export default function AdminProviders() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<ProviderForm>(EMPTY);
+
+  // Filter / sort state
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortKey, setSortKey] = useState<SortKey>("az");
 
   const { data: providers, isLoading } = trpc.providers.listAll.useQuery();
   const createMutation = trpc.providers.create.useMutation();
@@ -69,22 +78,124 @@ export default function AdminProviders() {
     utils.providers.listAll.invalidate();
   };
 
+  // Derived filtered + sorted list
+  const filtered = useMemo(() => {
+    let list = providers ?? [];
+
+    // Search by name, slug, or headquarters
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter((p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.slug.toLowerCase().includes(q) ||
+        (p.headquarters ?? "").toLowerCase().includes(q)
+      );
+    }
+
+    // Status filter
+    if (statusFilter === "active") list = list.filter((p) => p.isActive);
+    if (statusFilter === "inactive") list = list.filter((p) => !p.isActive);
+
+    // Sort
+    list = [...list].sort((a, b) => {
+      switch (sortKey) {
+        case "az": return a.name.localeCompare(b.name);
+        case "za": return b.name.localeCompare(a.name);
+        case "rating-desc": {
+          const ra = a.overallRating ? parseFloat(a.overallRating) : -1;
+          const rb = b.overallRating ? parseFloat(b.overallRating) : -1;
+          return rb - ra;
+        }
+        case "rating-asc": {
+          const ra = a.overallRating ? parseFloat(a.overallRating) : 999;
+          const rb = b.overallRating ? parseFloat(b.overallRating) : 999;
+          return ra - rb;
+        }
+        case "newest": return (b.id ?? 0) - (a.id ?? 0);
+        case "oldest": return (a.id ?? 0) - (b.id ?? 0);
+        default: return 0;
+      }
+    });
+
+    return list;
+  }, [providers, search, statusFilter, sortKey]);
+
+  const totalActive = (providers ?? []).filter((p) => p.isActive).length;
+  const totalInactive = (providers ?? []).filter((p) => !p.isActive).length;
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-semibold text-foreground">Providers</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage financial institutions and lenders.</p>
+          <p className="text-muted-foreground text-sm mt-1">
+            {isLoading ? "Loading…" : `${(providers ?? []).length} total · ${totalActive} active · ${totalInactive} inactive`}
+          </p>
         </div>
         <Button onClick={openNew} className="gap-2"><Plus className="w-4 h-4" /> Add Provider</Button>
       </div>
 
+      {/* Filter / sort bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[180px] max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Search providers…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8 h-9 text-sm"
+          />
+        </div>
+
+        {/* Status filter */}
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+          <SelectTrigger className="h-9 w-[130px] text-sm">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="active">Active only</SelectItem>
+            <SelectItem value="inactive">Inactive only</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Sort */}
+        <Select value={sortKey} onValueChange={(v) => setSortKey(v as SortKey)}>
+          <SelectTrigger className="h-9 w-[170px] text-sm gap-1.5">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="az">Name A → Z</SelectItem>
+            <SelectItem value="za">Name Z → A</SelectItem>
+            <SelectItem value="rating-desc">Highest rating</SelectItem>
+            <SelectItem value="rating-asc">Lowest rating</SelectItem>
+            <SelectItem value="newest">Newest first</SelectItem>
+            <SelectItem value="oldest">Oldest first</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Result count badge */}
+        {!isLoading && (search || statusFilter !== "all") && (
+          <span className="text-xs text-muted-foreground">
+            {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+          </span>
+        )}
+      </div>
+
+      {/* Grid */}
       {isLoading ? (
         <div className="space-y-2">{[1,2,3].map((i) => <Skeleton key={i} className="h-14 rounded-xl" />)}</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(providers ?? []).length === 0 && <div className="col-span-3 text-center py-12 text-muted-foreground">No providers yet.</div>}
-          {(providers ?? []).map((p) => (
+          {filtered.length === 0 && (
+            <div className="col-span-3 text-center py-12 text-muted-foreground">
+              {search || statusFilter !== "all" ? "No providers match your filters." : "No providers yet."}
+            </div>
+          )}
+          {filtered.map((p) => (
             <div key={p.id} className="card-premium p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
@@ -113,6 +224,7 @@ export default function AdminProviders() {
         </div>
       )}
 
+      {/* Edit / Create dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-serif">{editId ? "Edit Provider" : "Add Provider"}</DialogTitle></DialogHeader>
