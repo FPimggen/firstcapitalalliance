@@ -49,10 +49,11 @@ export default function HomePage() {
   return (
     <PublicLayout>
       <SEOMeta
-        title="First Capital Alliance — Compare Credit Cards, Loans & Mortgages"
-        description="Find and compare the best credit cards, personal loans, auto loans, and mortgages. Independent, expert-reviewed offers with transparent rates and fees."
+        title="Compare Credit Cards, Loans & Mortgages"
+        description="Compare credit cards, personal loans, mortgages, and savings accounts. Independent expert reviews, transparent rates — First Capital Alliance."
         canonical="https://firstcapitalalliance.com"
         jsonLd={jsonLd}
+        keywords="compare credit cards, personal loans, mortgage rates, auto loans, savings accounts, best credit cards, loan comparison, financial products"
       />
 
       {/* Hero */}

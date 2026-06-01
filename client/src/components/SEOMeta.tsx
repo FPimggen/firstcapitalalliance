@@ -11,6 +11,7 @@ interface SEOMetaProps {
   author?: string;
   jsonLd?: object | object[];
   noindex?: boolean;
+  keywords?: string;
 }
 
 export default function SEOMeta({
@@ -24,6 +25,7 @@ export default function SEOMeta({
   author,
   jsonLd,
   noindex = false,
+  keywords,
 }: SEOMetaProps) {
   const siteName = "First Capital Alliance";
   const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
@@ -44,6 +46,7 @@ export default function SEOMeta({
     };
 
     setMeta('meta[name="description"]', "content", description);
+    if (keywords) setMeta('meta[name="keywords"]', "content", keywords);
     setMeta('meta[name="fo-verify"]', "content", "6d6b8575-b49b-452b-bebe-72dc20d8096c");
     setMeta('meta[name="robots"]', "content", noindex ? "noindex,nofollow" : "index,follow");
 
