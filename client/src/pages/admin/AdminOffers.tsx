@@ -345,7 +345,7 @@ export default function AdminOffers() {
             <div className="col-span-2">
               <ImageUpload
                 label="Offer Image"
-                hint="Optional. If not set, the provider logo will be used. Accepts PNG, JPG, WebP up to 5 MB."
+                hint="Optional. If not set, the provider logo will be used. Accepts PNG, JPG, WebP, SVG up to 5 MB."
                 value={form.imageUrl || null}
                 onChange={(url) => setForm((f) => ({ ...f, imageUrl: url ?? "" }))}
               />

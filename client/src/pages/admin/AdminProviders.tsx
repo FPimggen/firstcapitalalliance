@@ -243,7 +243,7 @@ export default function AdminProviders() {
             <div className="col-span-2">
               <ImageUpload
                 label="Provider Logo"
-                hint="Optional. Used as the fallback image for all offers from this provider. PNG, JPG, WebP up to 5 MB."
+                hint="Optional. Used as the fallback image for all offers from this provider. PNG, JPG, WebP, SVG up to 5 MB."
                 value={form.logoUrl || null}
                 onChange={(url) => setForm((f) => ({ ...f, logoUrl: url ?? "" }))}
               />
