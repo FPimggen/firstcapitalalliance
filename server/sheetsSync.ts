@@ -13,39 +13,52 @@ import {
   type InsertOffer,
   type InsertProvider,
 } from "../drizzle/schema";
-import { execSync } from "child_process";
+import * as fs from "fs";
 import { ENV } from "./_core/env";
 
-// ─── Google Sheets via gws CLI ────────────────────────────────────────────────
-// We use the gws CLI (a Node.js wrapper) instead of calling the Sheets REST API
-// directly with a cached Bearer token. The CLI reads a fresh token from its own
-// config on every invocation, so it never goes stale and never needs re-auth.
+// ─── Google Sheets API ────────────────────────────────────────────────────────
+// The Manus platform writes a fresh OAuth token to ~/.user_env on every token
+// refresh cycle. We read that file on each sync call so we always use a valid
+// token regardless of how long the server process has been running.
 
-// Resolve the gws entry-point script once at startup
-const GWS_SCRIPT = "/home/ubuntu/.local/share/pnpm/global/v11/12-19e6d824cd5/node_modules/@googleworkspace/cli/run-gws.js";
+const USER_ENV_PATH = "/home/ubuntu/.user_env";
+const SHEETS_BASE = "https://sheets.googleapis.com/v4/spreadsheets";
 
-function fetchSheetValues(
+function getFreshGoogleToken(): string {
+  // 1. Try reading from the platform-managed ~/.user_env file (always fresh)
+  try {
+    const content = fs.readFileSync(USER_ENV_PATH, "utf8");
+    const match = content.match(/GOOGLE_WORKSPACE_CLI_TOKEN="([^"]+)"/);
+    if (match?.[1]) return match[1];
+  } catch {
+    // file not available — fall through to process.env
+  }
+  // 2. Fall back to process.env (may be stale but better than nothing)
+  const envToken = process.env.GOOGLE_WORKSPACE_CLI_TOKEN || process.env.GOOGLE_DRIVE_TOKEN;
+  if (envToken) return envToken;
+  throw new Error("No Google OAuth token available — ensure the Google Drive connector is enabled");
+}
+
+async function fetchSheetValues(
   spreadsheetId: string,
   ranges: string[]
-): Record<string, string[][]> {
-  const params = JSON.stringify({ spreadsheetId, ranges });
-  let raw: string;
-  try {
-    raw = execSync(
-      `node ${GWS_SCRIPT} sheets spreadsheets values batchGet --params '${params}'`,
-      { encoding: "utf8", timeout: 30_000 }
-    );
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    throw new Error(`gws CLI error fetching sheet data: ${msg}`);
+): Promise<Record<string, string[][]>> {
+  const token = getFreshGoogleToken();
+  const rangeParams = ranges.map((r) => `ranges=${encodeURIComponent(r)}`).join("&");
+  const url = `${SHEETS_BASE}/${spreadsheetId}/values:batchGet?${rangeParams}`;
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Sheets API error ${res.status}: ${text}`);
   }
 
-  let json: { valueRanges?: { range: string; values?: string[][] }[] };
-  try {
-    json = JSON.parse(raw);
-  } catch {
-    throw new Error(`gws CLI returned non-JSON: ${raw.substring(0, 200)}`);
-  }
+  const json = (await res.json()) as {
+    valueRanges?: { range: string; values?: string[][] }[];
+  };
 
   const result: Record<string, string[][]> = {};
   for (const vr of json.valueRanges ?? []) {
@@ -214,7 +227,7 @@ export async function runSheetsSync(triggeredBy: "manual" | "scheduled" = "manua
     ];
     const ranges = sheetNames.map((s) => `${s}!A1:Z500`);
 
-    const sheetData = fetchSheetValues(spreadsheetId, ranges);
+    const sheetData = await fetchSheetValues(spreadsheetId, ranges);
 
     // ── Sync Providers ─────────────────────────────────────────────────────
     const providerRangeKey = Object.keys(sheetData).find((k) => k.includes("Providers"));
