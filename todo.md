@@ -123,3 +123,14 @@
 - [x] Credit Cards nav dropdown updated with sub-category links
 - [x] getOffersByCardType db helper and byCardType tRPC procedure added
 - [x] Existing offers tagged with appropriate cardType values
+
+## Google Sheets Sync
+- [ ] Read all 7 sheets (Providers, Credit Cards, Personal Loans, Mortgages, Auto Loans, Savings Accounts, Checking Accounts)
+- [ ] Server-side sync handler: upsert providers and offers by slug (idempotent)
+- [ ] Store Google Sheets spreadsheet ID as env secret
+- [ ] tRPC admin.syncSheets procedure (protected, admin-only)
+- [ ] Scheduled heartbeat job for automatic sync (every 6 hours)
+- [ ] sync_log table to track last sync time, rows upserted, errors
+- [ ] Admin dashboard: Sync Now button with loading state and last-synced timestamp
+- [ ] Admin dashboard: sync result toast (X providers, Y offers synced)
+- [ ] Initial sync run to populate database from spreadsheet

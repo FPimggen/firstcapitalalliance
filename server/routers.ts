@@ -5,6 +5,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { invokeLLM } from "./_core/llm";
+import { runSheetsSync, getRecentSyncLogs } from "./sheetsSync";
 import {
   addAuditLog,
   createArticle,
@@ -340,6 +341,17 @@ const adminRouter = router({
     .query(({ input }) => getAuditLog(input?.limit ?? 50)),
   contentQueue: adminProcedure.query(() => getRecentJobs(30)),
   staleOffers: adminProcedure.query(() => getStaleOffers(30)),
+  syncSheets: adminProcedure
+    .input(z.object({ triggeredBy: z.enum(["manual", "scheduled"]).optional() }).optional())
+    .mutation(async ({ input }) => {
+      const result = await runSheetsSync(input?.triggeredBy ?? "manual");
+      return result;
+    }),
+  syncLogs: adminProcedure
+    .input(z.object({ limit: z.number().optional() }).optional())
+    .query(async ({ input }) => {
+      return getRecentSyncLogs(input?.limit ?? 10);
+    }),
 });
 
 // ─── AI Agent router ──────────────────────────────────────────────────────────

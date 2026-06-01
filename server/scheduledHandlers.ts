@@ -3,6 +3,7 @@ import { sdk } from "./_core/sdk";
 import { getDb } from "./db";
 import { offers, categories, articles, providers } from "../drizzle/schema";
 import { lt, and, isNull, or, eq } from "drizzle-orm";
+import { runSheetsSync } from "./sheetsSync";
 
 /**
  * POST /api/scheduled/offer-audit
@@ -52,6 +53,34 @@ export async function handleOfferAudit(req: Request, res: Response) {
       error: err.message,
       stack: err.stack,
       context: { url: req.url },
+      timestamp: new Date().toISOString(),
+    });
+  }
+}
+
+/**
+ * POST /api/scheduled/sheets-sync
+ * Heartbeat cron: syncs providers and offers from Google Sheets every 6 hours.
+ */
+export async function handleSheetsSync(req: Request, res: Response) {
+  try {
+    const user = await sdk.authenticateRequest(req);
+    if (!user.isCron) {
+      return res.status(403).json({ error: "cron-only endpoint" });
+    }
+
+    const result = await runSheetsSync("scheduled");
+    console.log(`[Sheets Sync] Completed: ${result.providersUpserted} providers, ${result.offersUpserted} offers`);
+
+    return res.json({
+      ok: true,
+      ...result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error("[Sheets Sync] Error:", err);
+    return res.status(500).json({
+      error: err.message,
       timestamp: new Date().toISOString(),
     });
   }

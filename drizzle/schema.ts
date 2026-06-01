@@ -210,3 +210,18 @@ export const auditLog = mysqlTable(
 
 export type AuditLog = typeof auditLog.$inferSelect;
 export type InsertAuditLog = typeof auditLog.$inferInsert;
+
+// ─── Sync Log ────────────────────────────────────────────────────────────────
+export const syncLog = mysqlTable("sync_log", {
+  id: int("id").autoincrement().primaryKey(),
+  triggeredBy: mysqlEnum("triggeredBy", ["manual", "scheduled"]).notNull().default("manual"),
+  status: mysqlEnum("status", ["running", "success", "error"]).notNull().default("running"),
+  providersUpserted: int("providersUpserted").default(0),
+  offersUpserted: int("offersUpserted").default(0),
+  errorMessage: text("errorMessage"),
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+});
+
+export type SyncLog = typeof syncLog.$inferSelect;
+export type InsertSyncLog = typeof syncLog.$inferInsert;

@@ -3,9 +3,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { toast } from "sonner";
 import {
   CreditCard, DollarSign, FileText, Building2, AlertTriangle,
-  TrendingUp, Clock, CheckCircle2, Activity, ArrowRight, Sparkles
+  TrendingUp, Clock, CheckCircle2, Activity, ArrowRight, Sparkles,
+  RefreshCw, Database, XCircle
 } from "lucide-react";
 
 function StatCard({ icon: Icon, label, value, sub, color = "navy" }: {
@@ -34,11 +36,24 @@ function StatCard({ icon: Icon, label, value, sub, color = "navy" }: {
 export default function AdminDashboard() {
   const { data, isLoading } = trpc.admin.dashboard.useQuery();
   const flagMutation = trpc.agent.flagStaleOffers.useMutation();
+  const syncMutation = trpc.admin.syncSheets.useMutation();
+  const { data: syncLogs, refetch: refetchSyncLogs } = trpc.admin.syncLogs.useQuery({ limit: 5 });
   const utils = trpc.useUtils();
 
   const handleFlagStale = async () => {
     await flagMutation.mutateAsync();
     utils.admin.dashboard.invalidate();
+  };
+
+  const handleSyncNow = async () => {
+    try {
+      const result = await syncMutation.mutateAsync({ triggeredBy: "manual" });
+      toast.success(`Sync complete — ${result.providersUpserted} providers, ${result.offersUpserted} offers updated.`);
+      utils.admin.dashboard.invalidate();
+      refetchSyncLogs();
+    } catch (err: any) {
+      toast.error(`Sync failed: ${err.message}`);
+    }
   };
 
   if (isLoading) {
@@ -149,6 +164,69 @@ export default function AdminDashboard() {
             View full audit log →
           </Link>
         </div>
+      </div>
+
+      {/* Google Sheets Sync */}
+      <div className="card-premium p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-foreground flex items-center gap-2">
+            <Database className="w-4 h-4 text-accent" /> Google Sheets Sync
+          </h2>
+          <Button
+            size="sm"
+            onClick={handleSyncNow}
+            disabled={syncMutation.isPending}
+            className="bg-[var(--navy-800)] hover:bg-[var(--navy-900)] text-white text-xs gap-1.5"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncMutation.isPending ? "animate-spin" : ""}`} />
+            {syncMutation.isPending ? "Syncing..." : "Sync Now"}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">
+          Pulls the latest providers and offers from your Google Sheet and upserts them into the database. Safe to run at any time — existing records are updated, new ones are added.
+        </p>
+        {syncMutation.data && (
+          <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800">
+            <CheckCircle2 className="w-3.5 h-3.5 inline mr-1.5" />
+            Last sync: {syncMutation.data.providersUpserted} providers, {syncMutation.data.offersUpserted} offers updated.
+            {syncMutation.data.errors.length > 0 && (
+              <span className="text-amber-700 ml-2">({syncMutation.data.errors.length} warnings)</span>
+            )}
+          </div>
+        )}
+        {syncLogs && syncLogs.length > 0 ? (
+          <div className="space-y-1.5">
+            <div className="text-xs font-medium text-muted-foreground mb-2">Recent Sync History</div>
+            {(syncLogs as any[]).map((log: any) => (
+              <div key={log.id} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
+                <div className="flex items-center gap-2">
+                  {log.status === "success" ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  ) : log.status === "error" ? (
+                    <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                  ) : (
+                    <RefreshCw className="w-3.5 h-3.5 text-amber-500 shrink-0 animate-spin" />
+                  )}
+                  <div>
+                    <span className="text-xs text-foreground">
+                      {log.status === "success"
+                        ? `${log.providersUpserted} providers, ${log.offersUpserted} offers`
+                        : log.status === "error"
+                        ? (log.errorMessage ?? "Error").slice(0, 60)
+                        : "Running..."}
+                    </span>
+                    <span className="text-xs text-muted-foreground ml-2">· {log.triggeredBy}</span>
+                  </div>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(log.startedAt).toLocaleString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">No sync history yet. Run your first sync above.</p>
+        )}
       </div>
 
       {/* Recent content jobs */}
