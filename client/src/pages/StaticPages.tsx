@@ -77,6 +77,54 @@ const PAGES: Record<string, { title: string; description: string; content: React
       </div>
     ),
   },
+  "/privacy": {
+    title: "Privacy Policy",
+    description: "How First Capital Alliance collects, uses, and protects your personal information.",
+    content: (
+      <div className="prose prose-sm max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed">
+        <p className="text-sm text-muted-foreground">Last updated: June 1, 2026</p>
+        <h2>Information We Collect</h2>
+        <p>First Capital Alliance collects information you provide directly (such as when you contact us or sign up for alerts), information collected automatically when you use our site (such as browser type, pages visited, and IP address via cookies and analytics tools), and information from third-party partners (such as advertising networks).</p>
+        <h2>How We Use Your Information</h2>
+        <p>We use collected information to operate and improve our website, personalize your experience, send you communications you've requested, display relevant advertising, and comply with legal obligations. We do not sell your personal information to third parties.</p>
+        <h2>Cookies and Tracking</h2>
+        <p>We use cookies and similar tracking technologies to analyze site traffic, remember your preferences, and serve relevant advertisements. You can control cookies through your browser settings. Disabling cookies may affect site functionality.</p>
+        <h2>Third-Party Links</h2>
+        <p>Our site contains links to third-party financial institutions and advertisers. We are not responsible for the privacy practices of these third parties. We encourage you to review their privacy policies before submitting any personal information.</p>
+        <h2>Data Security</h2>
+        <p>We implement reasonable technical and organizational measures to protect your information. However, no internet transmission is completely secure, and we cannot guarantee the security of information transmitted to our site.</p>
+        <h2>Your Rights</h2>
+        <p>Depending on your location, you may have rights to access, correct, or delete your personal information. To exercise these rights, contact us at privacy@firstcapitalalliance.com.</p>
+        <h2>Contact Us</h2>
+        <p>If you have questions about this Privacy Policy, contact us at privacy@firstcapitalalliance.com.</p>
+      </div>
+    ),
+  },
+  "/terms": {
+    title: "Terms of Use",
+    description: "Terms and conditions governing your use of the First Capital Alliance website.",
+    content: (
+      <div className="prose prose-sm max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed">
+        <p className="text-sm text-muted-foreground">Last updated: June 1, 2026</p>
+        <h2>Acceptance of Terms</h2>
+        <p>By accessing or using the First Capital Alliance website (firstcapitalalliance.com), you agree to be bound by these Terms of Use. If you do not agree to these terms, please do not use our site.</p>
+        <h2>Informational Purposes Only</h2>
+        <p>The content on this site is provided for informational purposes only and does not constitute financial, legal, or investment advice. Always consult with a qualified financial professional before making financial decisions. First Capital Alliance is not a bank, lender, or financial advisor.</p>
+        <h2>Accuracy of Information</h2>
+        <p>We make every effort to ensure the accuracy of information on our site. However, financial product terms, rates, and fees change frequently. We do not guarantee the accuracy, completeness, or timeliness of any information. Always verify current terms directly with the financial institution before applying.</p>
+        <h2>Affiliate Relationships</h2>
+        <p>First Capital Alliance participates in affiliate marketing programs. We may earn compensation when you click on links or apply for products featured on our site. This compensation does not affect the price you pay and does not influence our editorial ratings.</p>
+        <h2>Intellectual Property</h2>
+        <p>All content on this site, including text, graphics, logos, and software, is the property of First Capital Alliance or its content suppliers and is protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+        <h2>Limitation of Liability</h2>
+        <p>First Capital Alliance shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from your use of or inability to use this site or any information contained herein.</p>
+        <h2>Governing Law</h2>
+        <p>These Terms of Use are governed by the laws of the United States. Any disputes shall be resolved in the courts of the applicable jurisdiction.</p>
+        <h2>Contact Us</h2>
+        <p>If you have questions about these Terms of Use, contact us at legal@firstcapitalalliance.com.</p>
+      </div>
+    ),
+  },
   "/how-we-make-money": {
     title: "How We Make Money",
     description: "Transparency about First Capital Alliance's business model and revenue sources.",

@@ -33,6 +33,7 @@ const CALC_GROUPS = [
       { href: "/tools/credit-card-interest-calculator", label: "Credit Card Interest Calculator", desc: "Calculate how much interest you'll pay making only minimum payments." },
       { href: "/tools/credit-card-refi-calculator", label: "Credit Card Refinance Calculator", desc: "See how much you could save by refinancing high-interest card debt to a personal loan." },
       { href: "/tools/balance-transfer-calculator", label: "Balance Transfer Calculator", desc: "Compare keeping your balance vs. transferring to a 0% APR card." },
+      { href: "/tools/rewards-calculator", label: "Cash Back Rewards Calculator", desc: "Estimate your annual cash back earnings based on your monthly spending and reward rates." },
     ],
   },
   {

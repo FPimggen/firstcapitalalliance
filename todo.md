@@ -134,3 +134,22 @@
 - [x] Admin dashboard: Sync Now button with loading state and last-synced timestamp
 - [x] Admin dashboard: sync result toast (X providers, Y offers synced)
 - [x] Initial sync run to populate database from spreadsheet (requires admin login — use Sync Now button after deploy)
+
+## Launch Readiness Pass
+
+- [ ] Fix navigation: add Banking section (Checking, Savings, CDs), restructure Compare Now button
+- [ ] Fix footer: add /privacy, /terms routes; fix /compare link; add Checking/Savings/CDs to Products list
+- [ ] Build HELOC page (/mortgages/heloc)
+- [ ] Build Checking Accounts page (/checking-accounts)
+- [ ] Build CDs page (/cds)
+- [ ] Add /mortgages/refinance route
+- [ ] Build /compare hub page
+- [ ] Add /privacy and /terms static pages
+- [ ] Fix offer image display: remove rounded container box, show raw card image
+- [ ] Fix comparison tools: product name prominent, provider as subtitle
+- [ ] Fix MortgageCalculator: auto-hide/disable PMI when down payment >= 20%
+- [ ] Overhaul SavingsGoalCalculator to be intuitive and useful
+- [ ] Add dynamic contextual tool injection on offer detail pages
+- [ ] Add CDs category to sheetsSync and seed CD category in DB
+- [ ] Add checking-accounts, cds routes to App.tsx with ComparisonPage
+- [ ] Add category metadata for checking-accounts and cds in ComparisonPage

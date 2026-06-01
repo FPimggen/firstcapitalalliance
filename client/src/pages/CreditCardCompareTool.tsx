@@ -88,13 +88,13 @@ function CardSelector({
 
   if (selected) {
     return (
-      <div className="bg-card border-2 border-accent/30 rounded-xl p-4 relative">
+        <div className="bg-card border-2 border-accent/30 rounded-xl p-4 relative">
         <button onClick={onClear} className="absolute top-3 right-3 w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors" title="Remove">
           <X className="w-3.5 h-3.5 text-muted-foreground" />
         </button>
         <div className="pr-8">
-          <p className="text-xs text-muted-foreground mb-1">{selected.providerName}</p>
-          <h3 className="font-semibold text-foreground leading-snug text-sm">{selected.name}</h3>
+          <h3 className="font-semibold text-foreground leading-snug text-sm mb-0.5">{selected.name}</h3>
+          <p className="text-xs text-muted-foreground">{selected.providerName}</p>
           {selected.rating != null && (
             <div className="flex items-center gap-1 mt-1.5">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -283,8 +283,8 @@ export default function CreditCardCompareTool() {
                 <div className="px-4 py-4 bg-muted/50 border-r border-border" />
                 {selectedCards.map((card) => (
                   <div key={card.id} className="px-4 py-4 border-r border-border last:border-r-0 text-center">
-                    <p className="text-xs text-muted-foreground mb-0.5">{card.providerName}</p>
-                    <p className="font-semibold text-foreground text-sm leading-snug">{card.name}</p>
+                    <p className="font-bold text-foreground text-base leading-snug mb-0.5">{card.name}</p>
+                    <p className="text-xs text-muted-foreground">{card.providerName}</p>
                     {card.rating != null && (
                       <div className="flex items-center justify-center gap-0.5 mt-1.5">
                         {Array.from({ length: 5 }).map((_, i) => (

@@ -201,10 +201,16 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
               <tr key={offer.id} className={`hover:bg-muted/30 transition-colors ${offer.isFeatured ? "bg-[var(--teal-50)]" : "bg-card"}`}>
                 <td className="px-5 py-4">
                   <div className="flex items-start gap-3">
-                    {(offer as any).imageUrl || provider?.logoUrl ? (
+                    {(offer as any).imageUrl ? (
                       <img
-                        src={(offer as any).imageUrl || provider?.logoUrl}
+                        src={(offer as any).imageUrl}
                         alt={offer.productName}
+                        className="w-16 h-10 object-contain shrink-0"
+                      />
+                    ) : provider?.logoUrl ? (
+                      <img
+                        src={provider.logoUrl}
+                        alt={provider.name}
                         className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
                       />
                     ) : (
@@ -279,10 +285,16 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
           <div key={offer.id} className={`card-premium p-4 ${offer.isFeatured ? "border-[var(--teal-400)] bg-[var(--teal-50)]" : ""}`}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex items-start gap-3">
-                {(offer as any).imageUrl || provider?.logoUrl ? (
+                {(offer as any).imageUrl ? (
                   <img
-                    src={(offer as any).imageUrl || provider?.logoUrl}
+                    src={(offer as any).imageUrl}
                     alt={offer.productName}
+                    className="w-16 h-10 object-contain shrink-0"
+                  />
+                ) : provider?.logoUrl ? (
+                  <img
+                    src={provider.logoUrl}
+                    alt={provider.name}
                     className="w-10 h-10 rounded-lg object-contain bg-muted border border-border shrink-0"
                   />
                 ) : (

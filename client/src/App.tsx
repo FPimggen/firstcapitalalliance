@@ -29,7 +29,7 @@ import MortgageRefiCalculator from "./pages/tools/MortgageRefiCalculator";
 import HomeAffordabilityCalculator from "./pages/tools/HomeAffordabilityCalculator";
 import RentVsBuyCalculator from "./pages/tools/RentVsBuyCalculator";
 import { AutoLoanCalculator, AutoRefiCalculator } from "./pages/tools/AutoCalculators";
-import { SavingsGoalCalculator, SavingsComparisonCalculator, CDCalculator } from "./pages/tools/SavingsCalculators";
+import { SavingsGoalCalculator, SavingsComparisonCalculator, CDCalculator, RewardsCalculator } from "./pages/tools/SavingsCalculators";
 import { PersonalLoanCalculator, LoanComparisonCalculator, DebtConsolidationCalculator, DebtPayoffCalculator } from "./pages/tools/LoanCalculators";
 import { CreditCardPayoffCalculator, CreditCardInterestCalculator, CreditCardRefiCalculator, BalanceTransferCalculator } from "./pages/tools/CreditCardCalculators";
 import { AprApyConverter, DTICalculator } from "./pages/tools/GeneralCalculators";
@@ -38,6 +38,8 @@ import { CreditScoreHubPage, CardsByScorePage, AutoLoansByScorePage, MortgagesBy
 import { GlossaryIndexPage, GlossaryTermPage } from "./pages/Glossary";
 import CreditCardCompareTool from "./pages/CreditCardCompareTool";
 import CreditCardSubCategoryPage from "./pages/CreditCardSubCategoryPage";
+import HELOCPage from "./pages/HELOCPage";
+import CompareHub from "./pages/CompareHub";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -79,6 +81,12 @@ function Router() {
       <Route path="/mortgages">{() => <ComparisonPage categorySlug="mortgages" />}</Route>
       <Route path="/auto-loans">{() => <ComparisonPage categorySlug="auto-loans" />}</Route>
       <Route path="/savings-accounts">{() => <ComparisonPage categorySlug="savings-accounts" />}</Route>
+      <Route path="/checking-accounts">{() => <ComparisonPage categorySlug="checking-accounts" />}</Route>
+      <Route path="/cds">{() => <ComparisonPage categorySlug="cds" />}</Route>
+
+      {/* Mortgage sub-pages */}
+      <Route path="/mortgages/heloc" component={HELOCPage} />
+      <Route path="/mortgages/refinance">{() => <ComparisonPage categorySlug="mortgages" />}</Route>
 
       {/* Product detail pages */}
       <Route path="/offers/:slug" component={OfferDetailPage} />
@@ -102,6 +110,7 @@ function Router() {
       <Route path="/tools/credit-card-interest-calculator" component={CreditCardInterestCalculator} />
       <Route path="/tools/credit-card-refi-calculator" component={CreditCardRefiCalculator} />
       <Route path="/tools/balance-transfer-calculator" component={BalanceTransferCalculator} />
+      <Route path="/tools/rewards-calculator" component={RewardsCalculator} />
       <Route path="/tools/apr-apy-converter" component={AprApyConverter} />
       <Route path="/tools/dti-calculator" component={DTICalculator} />
 
@@ -117,12 +126,15 @@ function Router() {
       <Route path="/glossary/:slug" component={GlossaryTermPage} />
 
       {/* Compare tools */}
+      <Route path="/compare" component={CompareHub} />
       <Route path="/compare/credit-cards" component={CreditCardCompareTool} />
 
       {/* About page */}
       <Route path="/about" component={AboutPage} />
 
       {/* Static trust pages */}
+      <Route path="/privacy">{() => <StaticPage path="/privacy" />}</Route>
+      <Route path="/terms">{() => <StaticPage path="/terms" />}</Route>
       <Route path="/disclosure">{() => <StaticPage path="/disclosure" />}</Route>
       <Route path="/editorial-policy">{() => <StaticPage path="/editorial-policy" />}</Route>
       <Route path="/methodology">{() => <StaticPage path="/methodology" />}</Route>

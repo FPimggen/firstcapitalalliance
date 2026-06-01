@@ -10,6 +10,7 @@ const NAV_LINKS = [
     label: "Credit Cards",
     href: "/credit-cards",
     children: [
+      { label: "All Credit Cards", href: "/credit-cards" },
       { label: "Cash Back Cards", href: "/credit-cards/cash-back" },
       { label: "Travel Cards", href: "/credit-cards/travel" },
       { label: "Balance Transfer", href: "/credit-cards/balance-transfer" },
@@ -22,16 +23,18 @@ const NAV_LINKS = [
     children: [
       { label: "Personal Loans", href: "/personal-loans" },
       { label: "Auto Loans", href: "/auto-loans" },
-      { label: "Debt Consolidation", href: "/personal-loans/debt-consolidation" },
+      { label: "Mortgages", href: "/mortgages" },
+      { label: "HELOC", href: "/mortgages/heloc" },
+      { label: "Refinance", href: "/mortgages/refinance" },
     ],
   },
   {
-    label: "Mortgages",
-    href: "/mortgages",
+    label: "Banking",
+    href: "/savings-accounts",
     children: [
-      { label: "Home Loans", href: "/mortgages" },
-      { label: "Refinance", href: "/mortgages/refinance" },
-      { label: "HELOC", href: "/mortgages/heloc" },
+      { label: "Savings Accounts", href: "/savings-accounts" },
+      { label: "Checking Accounts", href: "/checking-accounts" },
+      { label: "CDs", href: "/cds" },
     ],
   },
   {
@@ -41,9 +44,9 @@ const NAV_LINKS = [
       { label: "All Calculators", href: "/tools" },
       { label: "Mortgage Calculator", href: "/tools/mortgage-calculator" },
       { label: "Auto Loan Calculator", href: "/tools/auto-loan-calculator" },
-      { label: "Credit Card Payoff", href: "/tools/credit-card-payoff-calculator" },
-      { label: "Debt Consolidation", href: "/tools/debt-consolidation-calculator" },
-      { label: "Savings Goal", href: "/tools/savings-goal-calculator" },
+      { label: "Balance Transfer Calc", href: "/tools/balance-transfer-calculator" },
+      { label: "Savings Goal Calc", href: "/tools/savings-goal-calculator" },
+      { label: "CD Calculator", href: "/tools/cd-calculator" },
       { label: "DTI Calculator", href: "/tools/dti-calculator" },
     ],
   },
@@ -73,7 +76,6 @@ const NAV_LINKS = [
 
 function DropdownMenu({ items, onMouseEnter, onMouseLeave }: { items: { label: string; href: string }[]; onMouseEnter: () => void; onMouseLeave: () => void }) {
   return (
-    // pt-2 creates an invisible bridge so the mouse doesn't leave the parent when moving from link to menu
     <div className="absolute top-full left-0 pt-2 w-52 z-50" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <div className="bg-card border border-border rounded-xl shadow-lg py-1.5">
         {items.map((item) => (
@@ -171,10 +173,10 @@ export function PublicNav() {
           {/* Right actions */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
-              href="/credit-cards"
+              href="/compare/credit-cards"
               className="btn-cta text-sm px-4 py-2"
             >
-              Compare Now
+              Compare Cards
             </Link>
           </div>
 
@@ -220,11 +222,11 @@ export function PublicNav() {
             ))}
             <div className="pt-3 border-t border-border">
               <Link
-                href="/credit-cards"
+                href="/compare/credit-cards"
                 className="btn-cta w-full justify-center"
                 onClick={() => setMobileOpen(false)}
               >
-                Compare Now
+                Compare Cards
               </Link>
             </div>
           </div>
@@ -252,7 +254,7 @@ export function PublicFooter() {
               </Link>
             </div>
             <p className="text-sm leading-relaxed text-[oklch(65%_0.02_250)] max-w-xs">
-              An independent financial comparison platform helping consumers make informed decisions about credit cards, loans, and mortgages.
+              An independent financial comparison platform helping consumers make informed decisions about credit cards, loans, mortgages, and banking products.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="trust-badge bg-[var(--navy-800)] text-[oklch(70%_0.02_250)]">
@@ -271,6 +273,9 @@ export function PublicFooter() {
                 ["Auto Loans", "/auto-loans"],
                 ["Mortgages", "/mortgages"],
                 ["HELOC", "/mortgages/heloc"],
+                ["Savings Accounts", "/savings-accounts"],
+                ["Checking Accounts", "/checking-accounts"],
+                ["CDs", "/cds"],
               ].map(([label, href]) => (
                 <li key={href}>
                   <Link href={href} className="text-sm hover:text-[var(--teal-400)] transition-colors">
@@ -289,7 +294,9 @@ export function PublicFooter() {
                 ["Articles & Guides", "/learn"],
                 ["Providers", "/providers"],
                 ["Calculators", "/tools"],
-                ["Compare Products", "/compare"],
+                ["Compare Products", "/compare/credit-cards"],
+                ["Credit Score Guide", "/credit-score"],
+                ["Financial Glossary", "/glossary"],
               ].map(([label, href]) => (
                 <li key={href}>
                   <Link href={href} className="text-sm hover:text-[var(--teal-400)] transition-colors">

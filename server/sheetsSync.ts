@@ -76,6 +76,7 @@ const SHEET_TO_CATEGORY: Record<string, string> = {
   "Auto Loans": "auto-loans",
   "Savings Accounts": "savings-accounts",
   "Checking Accounts": "checking-accounts",
+  CD: "cds",
 };
 
 // ─── Row parsers ──────────────────────────────────────────────────────────────
@@ -224,6 +225,7 @@ export async function runSheetsSync(triggeredBy: "manual" | "scheduled" = "manua
       "Auto Loans",
       "Savings Accounts",
       "Checking Accounts",
+      "CD",
     ];
     const ranges = sheetNames.map((s) => `${s}!A1:Z500`);
 

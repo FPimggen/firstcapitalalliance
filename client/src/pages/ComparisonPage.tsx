@@ -35,6 +35,26 @@ const CATEGORY_META: Record<string, { title: string; description: string; hero: 
       { q: "What credit score do I need for a good auto loan rate?", a: "Borrowers with scores above 720 typically qualify for the best auto loan rates. Rates increase significantly below 660. Most lenders will finance borrowers with scores as low as 580." },
     ],
   },
+  "checking-accounts": {
+    title: "Best Checking Accounts",
+    description: "Compare the best checking accounts of 2026 — no monthly fees, high interest, cash back, and great perks. Find the right account for your banking needs.",
+    hero: "Find a checking account that works for you — no hidden fees, competitive interest, and features that make everyday banking easier.",
+    faqs: [
+      { q: "What should I look for in a checking account?", a: "Look for no monthly maintenance fees (or easy fee waivers), a large ATM network or ATM fee reimbursements, FDIC insurance, mobile check deposit, and competitive interest if you keep a balance." },
+      { q: "What is the difference between a checking and savings account?", a: "Checking accounts are designed for daily transactions — paying bills, debit card purchases, and ATM withdrawals. Savings accounts are designed to hold money you don't need immediately and typically earn higher interest." },
+      { q: "Are online checking accounts safe?", a: "Yes. Online checking accounts at FDIC-insured banks are just as safe as traditional bank accounts. Your deposits are insured up to $250,000 per depositor, per institution." },
+    ],
+  },
+  "cds": {
+    title: "Best CD Rates",
+    description: "Compare the best CD (Certificate of Deposit) rates from top banks and credit unions. Find competitive APYs for 3-month, 6-month, 1-year, and 5-year CDs.",
+    hero: "Lock in a guaranteed return with a Certificate of Deposit. Compare CD rates from top banks and credit unions to find the best APY for your term.",
+    faqs: [
+      { q: "What is a CD and how does it work?", a: "A Certificate of Deposit (CD) is a savings account that holds a fixed amount of money for a fixed period of time (the term). In exchange, the bank pays a guaranteed interest rate. At the end of the term (maturity), you receive your original deposit plus the interest earned." },
+      { q: "What happens if I withdraw from a CD early?", a: "Most CDs charge an early withdrawal penalty if you take money out before the maturity date. Penalties vary by bank and term length but typically range from 60 days to 12 months of interest. Some banks offer no-penalty CDs with lower rates." },
+      { q: "Are CDs FDIC insured?", a: "Yes. CDs at FDIC-insured banks are insured up to $250,000 per depositor, per institution. CDs at NCUA-insured credit unions have equivalent protection." },
+    ],
+  },
   "mortgages": {
     title: "Best Mortgage Lenders",
     description: "Compare mortgage rates and lenders for home purchase and refinance. Find competitive rates for conventional, FHA, VA, and jumbo loans.",

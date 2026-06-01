@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, ExternalLink, Star, Clock, AlertTriangle, ArrowLeft } from "lucide-react";
+import ContextualTools from "@/components/ContextualTools";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -82,10 +83,16 @@ export default function OfferDetailPage() {
             { label: offer.productName },
           ]} />
           <div className="flex flex-col sm:flex-row sm:items-start gap-5 mt-5">
-            {(offer as any).imageUrl || provider?.logoUrl ? (
+            {(offer as any).imageUrl ? (
               <img
-                src={(offer as any).imageUrl || provider?.logoUrl}
+                src={(offer as any).imageUrl}
                 alt={offer.productName}
+                className="w-24 h-16 object-contain shrink-0"
+              />
+            ) : provider?.logoUrl ? (
+              <img
+                src={provider.logoUrl}
+                alt={provider.name}
                 className="w-16 h-16 rounded-xl object-contain bg-muted border border-border shrink-0"
               />
             ) : (
@@ -242,6 +249,20 @@ export default function OfferDetailPage() {
               </div>
             )}
 
+            {/* Contextual calculator tools */}
+            {category?.slug && (
+              <ContextualTools
+                categorySlug={category.slug}
+                cardType={(offer as any).cardType ?? null}
+                offer={{
+                  aprMin: offer.aprMin,
+                  aprMax: offer.aprMax,
+                  annualFee: offer.annualFee,
+                  rewardsRate: offer.rewardsRate,
+                }}
+              />
+            )}
+
             <Link href={`/${category?.slug ?? "products"}`} className="inline-flex items-center gap-2 text-sm text-accent hover:underline">
               <ArrowLeft className="w-4 h-4" /> Back to {category?.name ?? "Products"}
             </Link>
@@ -251,10 +272,16 @@ export default function OfferDetailPage() {
           <div className="space-y-5">
             {/* CTA card */}
             <div className="card-premium p-6 text-center">
-              {(offer as any).imageUrl || provider?.logoUrl ? (
+              {(offer as any).imageUrl ? (
                 <img
-                  src={(offer as any).imageUrl || provider?.logoUrl}
+                  src={(offer as any).imageUrl}
                   alt={offer.productName}
+                  className="w-32 h-20 object-contain mx-auto mb-3"
+                />
+              ) : provider?.logoUrl ? (
+                <img
+                  src={provider.logoUrl}
+                  alt={provider.name}
                   className="w-14 h-14 rounded-xl object-contain bg-muted border border-border mx-auto mb-3"
                 />
               ) : (
