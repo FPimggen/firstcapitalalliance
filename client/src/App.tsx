@@ -34,6 +34,9 @@ import { PersonalLoanCalculator, LoanComparisonCalculator, DebtConsolidationCalc
 import { CreditCardPayoffCalculator, CreditCardInterestCalculator, CreditCardRefiCalculator, BalanceTransferCalculator } from "./pages/tools/CreditCardCalculators";
 import { AprApyConverter, DTICalculator } from "./pages/tools/GeneralCalculators";
 import AdminArticles from "./pages/admin/AdminArticles";
+import { CreditScoreHubPage, CardsByScorePage, AutoLoansByScorePage, MortgagesByScorePage, PersonalLoansByScorePage } from "./pages/CreditScoreHub";
+import { GlossaryIndexPage, GlossaryTermPage } from "./pages/Glossary";
+import CreditCardCompareTool from "./pages/CreditCardCompareTool";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -94,6 +97,20 @@ function Router() {
       <Route path="/tools/balance-transfer-calculator" component={BalanceTransferCalculator} />
       <Route path="/tools/apr-apy-converter" component={AprApyConverter} />
       <Route path="/tools/dti-calculator" component={DTICalculator} />
+
+      {/* Credit score hub */}
+      <Route path="/credit-score" component={CreditScoreHubPage} />
+      <Route path="/credit-score/cards-by-score" component={CardsByScorePage} />
+      <Route path="/credit-score/auto-loans-by-score" component={AutoLoansByScorePage} />
+      <Route path="/credit-score/mortgages-by-score" component={MortgagesByScorePage} />
+      <Route path="/credit-score/personal-loans-by-score" component={PersonalLoansByScorePage} />
+
+      {/* Financial glossary */}
+      <Route path="/glossary" component={GlossaryIndexPage} />
+      <Route path="/glossary/:slug" component={GlossaryTermPage} />
+
+      {/* Compare tools */}
+      <Route path="/compare/credit-cards" component={CreditCardCompareTool} />
 
       {/* About page */}
       <Route path="/about" component={AboutPage} />

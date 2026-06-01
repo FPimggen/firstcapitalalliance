@@ -47,8 +47,28 @@ const NAV_LINKS = [
       { label: "DTI Calculator", href: "/tools/dti-calculator" },
     ],
   },
-  { label: "Providers", href: "/providers" },
-  { label: "Learn", href: "/learn" },
+  {
+    label: "Credit Score",
+    href: "/credit-score",
+    children: [
+      { label: "Credit Score Guide", href: "/credit-score" },
+      { label: "Cards by Score", href: "/credit-score/cards-by-score" },
+      { label: "Auto Loans by Score", href: "/credit-score/auto-loans-by-score" },
+      { label: "Mortgages by Score", href: "/credit-score/mortgages-by-score" },
+      { label: "Personal Loans by Score", href: "/credit-score/personal-loans-by-score" },
+    ],
+  },
+  {
+    label: "Resources",
+    href: "/learn",
+    children: [
+      { label: "Articles & Guides", href: "/learn" },
+      { label: "Financial Glossary", href: "/glossary" },
+      { label: "Compare Credit Cards", href: "/compare/credit-cards" },
+      { label: "All Providers", href: "/providers" },
+      { label: "About Us", href: "/about" },
+    ],
+  },
 ];
 
 function DropdownMenu({ items, onMouseEnter, onMouseLeave }: { items: { label: string; href: string }[]; onMouseEnter: () => void; onMouseLeave: () => void }) {
