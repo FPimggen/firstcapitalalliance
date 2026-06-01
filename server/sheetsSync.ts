@@ -250,9 +250,13 @@ export async function runSheetsSync(triggeredBy: "manual" | "scheduled" = "manua
       }
     }
 
-    // Build provider slug → id map
-    const allProviders = await db.select({ id: providers.id, slug: providers.slug }).from(providers);
-    const providerMap = new Map(allProviders.map((p) => [p.slug, p.id]));
+    // Build provider slug → id map (keyed by both slug AND name-as-slug for flexible matching)
+    const allProviders = await db.select({ id: providers.id, slug: providers.slug, name: providers.name }).from(providers);
+    const providerMap = new Map<string, number>();
+    for (const p of allProviders) {
+      providerMap.set(p.slug, p.id);           // match by slug
+      providerMap.set(toSlug(p.name), p.id);   // match by name-as-slug (handles sheet using names)
+    }
 
     // Build category slug → id map
     const allCategories = await db.select({ id: categories.id, slug: categories.slug }).from(categories);
@@ -276,9 +280,11 @@ export async function runSheetsSync(triggeredBy: "manual" | "scheduled" = "manua
         const parsed = parseOffer(row, categorySlug, hasCardType);
         if (!parsed) continue;
 
-        const providerId = providerMap.get(parsed.providerSlug);
+        // The sheet may use provider name or slug — normalize to slug for lookup
+        const providerLookupKey = toSlug(parsed.providerSlug);
+        const providerId = providerMap.get(providerLookupKey) ?? providerMap.get(parsed.providerSlug);
         if (!providerId) {
-          errors.push(`Provider not found for offer "${parsed.offer.slug}": ${parsed.providerSlug}`);
+          errors.push(`Provider not found for offer "${parsed.offer.slug}": ${parsed.providerSlug} (tried slug: ${providerLookupKey})`);
           continue;
         }
 
