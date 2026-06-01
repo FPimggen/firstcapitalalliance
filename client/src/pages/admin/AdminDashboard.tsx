@@ -40,7 +40,9 @@ export default function AdminDashboard() {
   const { data: syncLogs, refetch: refetchSyncLogs } = trpc.admin.syncLogs.useQuery({ limit: 5 });
   const { data: offerStats } = trpc.tracking.getStats.useQuery();
   const { data: sitemapMeta } = trpc.sitemap.getLatestMeta.useQuery();
+  const { data: cronTaskUid } = trpc.sitemap.getCronTaskUid.useQuery();
   const generateSitemapMutation = trpc.sitemap.generate.useMutation();
+  const scheduleAutoRegenMutation = trpc.sitemap.scheduleAutoRegen.useMutation();
   const utils = trpc.useUtils();
 
   const handleFlagStale = async () => {
@@ -311,8 +313,39 @@ export default function AdminDashboard() {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mb-3">
-          The sitemap is served dynamically at <a href="/sitemap.xml" target="_blank" className="text-accent hover:underline">/sitemap.xml</a> and auto-regenerates every 7 days via a scheduled heartbeat. Click "Generate Now" to record a manual generation.
+          The sitemap is served dynamically at <a href="/sitemap.xml" target="_blank" className="text-accent hover:underline">/sitemap.xml</a>. Click "Generate Now" to record a manual generation, or activate the 7-day auto-regen schedule.
         </p>
+        {cronTaskUid ? (
+          <div className="mb-3 flex items-center gap-1.5 text-xs text-emerald-600">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>7-day auto-regen is active — runs every Sunday at 3:00 AM UTC</span>
+          </div>
+        ) : (
+          <div className="mb-3">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={async () => {
+                try {
+                  const result = await scheduleAutoRegenMutation.mutateAsync();
+                  if ((result as any).alreadyExists) {
+                    toast.info("Auto-regen schedule is already active.");
+                  } else {
+                    toast.success("7-day sitemap auto-regen schedule activated!");
+                  }
+                  utils.sitemap.getCronTaskUid.invalidate();
+                } catch (e: any) {
+                  toast.error(e.message ?? "Failed to activate schedule");
+                }
+              }}
+              disabled={scheduleAutoRegenMutation.isPending}
+              className="text-xs gap-1.5 border-[var(--teal-500)] text-[var(--teal-600)] hover:bg-[var(--teal-50)]"
+            >
+              <Clock className="w-3.5 h-3.5" />
+              {scheduleAutoRegenMutation.isPending ? "Activating..." : "Activate 7-Day Auto-Regen"}
+            </Button>
+          </div>
+        )}
         {sitemapMeta ? (
           <div className="flex flex-wrap gap-4 text-xs">
             <div className="flex items-center gap-1.5">
