@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Globe, MapPin, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, Pencil, Trash2, Globe, MapPin, Search, SlidersHorizontal, ExternalLink } from "lucide-react";
 import { ImageUpload } from "@/components/ImageUpload";
 
 type ProviderForm = {
@@ -217,6 +217,11 @@ export default function AdminProviders() {
               {p.websiteUrl && <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2"><Globe className="w-3 h-3" /><a href={p.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline truncate">{p.websiteUrl}</a></div>}
               <div className="flex gap-2 mt-3">
                 <Button size="sm" variant="outline" className="flex-1 h-7 text-xs gap-1" onClick={() => openEdit(p)}><Pencil className="w-3 h-3" /> Edit</Button>
+                <a href={`/providers/${p.slug}`} target="_blank" rel="noopener noreferrer" title="View live page">
+                  <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-accent hover:text-accent/80">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Button>
+                </a>
                 <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-600" onClick={() => handleDelete(p.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
               </div>
             </div>

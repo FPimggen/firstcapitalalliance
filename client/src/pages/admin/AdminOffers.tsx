@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, CheckCircle2, AlertTriangle, Clock, Star, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, CheckCircle2, AlertTriangle, Clock, Star, Sparkles, ExternalLink } from "lucide-react";
 import { ImageUpload } from "@/components/ImageUpload";
 
 type OfferForm = {
@@ -242,13 +242,18 @@ export default function AdminOffers() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => openEdit({ offer, provider, category })}>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => openEdit({ offer, provider, category })} title="Edit offer">
                           <Pencil className="w-3.5 h-3.5" />
                         </Button>
                         <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-emerald-600 hover:text-emerald-700" onClick={() => handleMarkVerified(offer.id)} title="Mark verified">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                         </Button>
-                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-600" onClick={() => handleDelete(offer.id)}>
+                        <a href={`/offers/${offer.slug}`} target="_blank" rel="noopener noreferrer" title="View live page">
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-accent hover:text-accent/80" asChild={false}>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </Button>
+                        </a>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-600" onClick={() => handleDelete(offer.id)} title="Delete offer">
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
