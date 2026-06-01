@@ -83,8 +83,8 @@ export default function AdminOffers() {
       imageUrl: offer.offer.imageUrl ?? "",
       trackingUrl: offer.offer.trackingUrl ?? "",
       editorialSummary: offer.offer.editorialSummary ?? "",
-      pros: (offer.offer.pros ?? []).join("\n"),
-      cons: (offer.offer.cons ?? []).join("\n"),
+      pros: (Array.isArray(offer.offer.pros) ? offer.offer.pros : []).join("\n"),
+      cons: (Array.isArray(offer.offer.cons) ? offer.offer.cons : []).join("\n"),
       isFeatured: offer.offer.isFeatured ?? false,
       isActive: offer.offer.isActive ?? true,
     });
