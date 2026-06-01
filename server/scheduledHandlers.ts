@@ -130,10 +130,22 @@ export async function handleSitemap(req: Request, res: Response) {
 
     const allUrls = [...staticUrls, ...dynamicUrls];
 
+    // XML-escape special characters in URLs (& must become &amp; etc.)
+    const escapeXml = (str: string) =>
+      str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+          http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${allUrls.map((u) => `  <url>
-    <loc>${u.loc}</loc>
+    <loc>${escapeXml(u.loc)}</loc>
     <lastmod>${u.lastmod ?? now}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
