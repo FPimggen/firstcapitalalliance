@@ -125,12 +125,12 @@
 - [x] Existing offers tagged with appropriate cardType values
 
 ## Google Sheets Sync
-- [ ] Read all 7 sheets (Providers, Credit Cards, Personal Loans, Mortgages, Auto Loans, Savings Accounts, Checking Accounts)
-- [ ] Server-side sync handler: upsert providers and offers by slug (idempotent)
-- [ ] Store Google Sheets spreadsheet ID as env secret
-- [ ] tRPC admin.syncSheets procedure (protected, admin-only)
-- [ ] Scheduled heartbeat job for automatic sync (every 6 hours)
-- [ ] sync_log table to track last sync time, rows upserted, errors
-- [ ] Admin dashboard: Sync Now button with loading state and last-synced timestamp
-- [ ] Admin dashboard: sync result toast (X providers, Y offers synced)
-- [ ] Initial sync run to populate database from spreadsheet
+- [x] Read all 7 sheets (Providers, Credit Cards, Personal Loans, Mortgages, Auto Loans, Savings Accounts, Checking Accounts)
+- [x] Server-side sync handler: upsert providers and offers by slug (idempotent)
+- [x] Store Google Sheets spreadsheet ID as env secret
+- [x] tRPC admin.syncSheets procedure (protected, admin-only)
+- [x] Scheduled heartbeat endpoint at /api/scheduled/sheets-sync (heartbeat cron, requires deploy)
+- [x] sync_log table to track last sync time, rows upserted, errors
+- [x] Admin dashboard: Sync Now button with loading state and last-synced timestamp
+- [x] Admin dashboard: sync result toast (X providers, Y offers synced)
+- [ ] Initial sync run to populate database from spreadsheet (requires admin login — use Sync Now button after deploy)
