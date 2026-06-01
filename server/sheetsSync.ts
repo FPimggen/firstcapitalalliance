@@ -13,40 +13,39 @@ import {
   type InsertOffer,
   type InsertProvider,
 } from "../drizzle/schema";
+import { execSync } from "child_process";
 import { ENV } from "./_core/env";
 
-// ─── Google Sheets API ────────────────────────────────────────────────────────
+// ─── Google Sheets via gws CLI ────────────────────────────────────────────────
+// We use the gws CLI (a Node.js wrapper) instead of calling the Sheets REST API
+// directly with a cached Bearer token. The CLI reads a fresh token from its own
+// config on every invocation, so it never goes stale and never needs re-auth.
 
-const SHEETS_BASE = "https://sheets.googleapis.com/v4/spreadsheets";
+// Resolve the gws entry-point script once at startup
+const GWS_SCRIPT = "/home/ubuntu/.local/share/pnpm/global/v11/12-19e6d824cd5/node_modules/@googleworkspace/cli/run-gws.js";
 
-async function fetchSheetValues(
+function fetchSheetValues(
   spreadsheetId: string,
   ranges: string[]
-): Promise<Record<string, string[][]>> {
-  // Use GOOGLE_WORKSPACE_CLI_TOKEN (injected by the Manus platform) for direct Sheets API access
-  const googleToken = process.env.GOOGLE_WORKSPACE_CLI_TOKEN || process.env.GOOGLE_DRIVE_TOKEN;
-  if (!googleToken) {
-    throw new Error("GOOGLE_WORKSPACE_CLI_TOKEN not available — cannot access Google Sheets");
+): Record<string, string[][]> {
+  const params = JSON.stringify({ spreadsheetId, ranges });
+  let raw: string;
+  try {
+    raw = execSync(
+      `node ${GWS_SCRIPT} sheets spreadsheets values batchGet --params '${params}'`,
+      { encoding: "utf8", timeout: 30_000 }
+    );
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`gws CLI error fetching sheet data: ${msg}`);
   }
 
-  const rangeParams = ranges.map((r) => `ranges=${encodeURIComponent(r)}`).join("&");
-  const url = `${SHEETS_BASE}/${spreadsheetId}/values:batchGet?${rangeParams}`;
-
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${googleToken}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Sheets API error ${res.status}: ${text}`);
+  let json: { valueRanges?: { range: string; values?: string[][] }[] };
+  try {
+    json = JSON.parse(raw);
+  } catch {
+    throw new Error(`gws CLI returned non-JSON: ${raw.substring(0, 200)}`);
   }
-
-  const json = (await res.json()) as {
-    valueRanges?: { range: string; values?: string[][] }[];
-  };
 
   const result: Record<string, string[][]> = {};
   for (const vr of json.valueRanges ?? []) {
@@ -215,7 +214,7 @@ export async function runSheetsSync(triggeredBy: "manual" | "scheduled" = "manua
     ];
     const ranges = sheetNames.map((s) => `${s}!A1:Z500`);
 
-    const sheetData = await fetchSheetValues(spreadsheetId, ranges);
+    const sheetData = fetchSheetValues(spreadsheetId, ranges);
 
     // ── Sync Providers ─────────────────────────────────────────────────────
     const providerRangeKey = Object.keys(sheetData).find((k) => k.includes("Providers"));
