@@ -45,6 +45,15 @@ interface OfferTableProps {
   showCategory?: boolean;
 }
 
+/** Maps a numeric credit score to the standard label used on the site */
+function creditScoreLabel(score: number): string {
+  if (score >= 800) return "Excellent";
+  if (score >= 740) return "Very Good";
+  if (score >= 670) return "Good";
+  if (score >= 580) return "Fair";
+  return "Any";
+}
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-1">
@@ -255,7 +264,7 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
                 </td>
                 <td className="px-4 py-4">
                   {offer.minCreditScore ? (
-                    <span className="text-sm font-medium">{offer.minCreditScore}+</span>
+                    <span className="text-sm font-medium">{creditScoreLabel(offer.minCreditScore)}</span>
                   ) : <span className="text-muted-foreground text-xs">Not specified</span>}
                 </td>
                 <td className="px-4 py-4">
@@ -321,7 +330,7 @@ export default function OfferTable({ offers, showCategory = false }: OfferTableP
             <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
               <div><span className="text-muted-foreground">APR: </span><span className="font-semibold">{offer.aprMin ? `${offer.aprMin}%${offer.aprMax && offer.aprMax !== offer.aprMin ? `–${offer.aprMax}%` : ""}` : "See terms"}</span></div>
               <div><span className="text-muted-foreground">Fee: </span><span className={`font-semibold ${offer.annualFee && parseFloat(offer.annualFee) === 0 ? "text-emerald-600" : ""}`}>{offer.annualFee !== null && offer.annualFee !== undefined ? (parseFloat(offer.annualFee) === 0 ? "$0" : `$${parseFloat(offer.annualFee).toFixed(0)}/yr`) : "See terms"}</span></div>
-              <div><span className="text-muted-foreground">Min. Credit: </span><span className="font-semibold">{offer.minCreditScore ? `${offer.minCreditScore}+` : "N/A"}</span></div>
+              <div><span className="text-muted-foreground">Min. Credit: </span><span className="font-semibold">{offer.minCreditScore ? creditScoreLabel(offer.minCreditScore) : "N/A"}</span></div>
               <div>{offer.overallRating && <StarRating rating={parseFloat(offer.overallRating)} />}</div>
             </div>
             <LastVerified date={offer.lastVerifiedAt} />

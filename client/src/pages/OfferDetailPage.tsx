@@ -186,7 +186,12 @@ export default function OfferDetailPage() {
                 {offer.minCreditScore && (
                   <div>
                     <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Min. Credit Score</div>
-                    <div className="font-semibold text-foreground">{offer.minCreditScore}+</div>
+                    <div className="font-semibold text-foreground">
+                      {offer.minCreditScore >= 800 ? "Excellent" :
+                       offer.minCreditScore >= 740 ? "Very Good" :
+                       offer.minCreditScore >= 670 ? "Good" :
+                       offer.minCreditScore >= 580 ? "Fair" : "Any"}
+                    </div>
                   </div>
                 )}
                 {offer.termMin && (
