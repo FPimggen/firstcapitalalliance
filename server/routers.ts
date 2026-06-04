@@ -50,6 +50,11 @@ import {
   updateOffer,
   updateProvider,
   upsertPage,
+  getAffiliateAds,
+  getActiveAdsByTags,
+  createAffiliateAd,
+  updateAffiliateAd,
+  deleteAffiliateAd,
 } from "./db";
 
 // ─── Admin guard ──────────────────────────────────────────────────────────────
@@ -514,6 +519,69 @@ const sitemapRouter = router({
   }),
 });
 
+// ─── Affiliate Ads router ───────────────────────────────────────────────────
+const adsRouter = router({
+  // Public: fetch active ads filtered by context tags
+  listActive: publicProcedure
+    .input(z.object({ tags: z.array(z.string()).optional() }))
+    .query(async ({ input }) => {
+      const ads = await getActiveAdsByTags(input.tags ?? []);
+      if (!input.tags || input.tags.length === 0) return ads;
+      // Filter by tags: ad matches if it has no tags (show everywhere) or shares at least one tag
+      return ads.filter((ad) => {
+        if (!ad.tags) return true;
+        const adTags = ad.tags.split(",").map((t) => t.trim());
+        return input.tags!.some((t) => adTags.includes(t));
+      });
+    }),
+  // Admin: full list including inactive
+  listAll: adminProcedure.query(() => getAffiliateAds(false)),
+  create: adminProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        marketplace: z.string().default(""),
+        affiliateLink: z.string().url(),
+        squareImageUrl: z.string().optional(),
+        verticalImageUrl: z.string().optional(),
+        horizontalImageUrl: z.string().optional(),
+        priority: z.enum(["low", "moderate", "high"]).default("moderate"),
+        tags: z.string().optional(),
+        isActive: z.boolean().default(true),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await createAffiliateAd(input);
+      await addAuditLog({ action: "create_affiliate_ad", entityType: "affiliate_ad", triggeredBy: ctx.user.name ?? ctx.user.openId });
+    }),
+  update: adminProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        marketplace: z.string().optional(),
+        affiliateLink: z.string().url().optional(),
+        squareImageUrl: z.string().nullable().optional(),
+        verticalImageUrl: z.string().nullable().optional(),
+        horizontalImageUrl: z.string().nullable().optional(),
+        priority: z.enum(["low", "moderate", "high"]).optional(),
+        tags: z.string().nullable().optional(),
+        isActive: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, ...data } = input;
+      await updateAffiliateAd(id, data);
+      await addAuditLog({ action: "update_affiliate_ad", entityType: "affiliate_ad", entityId: id, triggeredBy: ctx.user.name ?? ctx.user.openId });
+    }),
+  delete: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      await deleteAffiliateAd(input.id);
+      await addAuditLog({ action: "delete_affiliate_ad", entityType: "affiliate_ad", entityId: input.id, triggeredBy: ctx.user.name ?? ctx.user.openId });
+    }),
+});
+
 // ─── App router ───────────────────────────────────────────────────────────────
 export const appRouter = router({
   system: systemRouter,
@@ -533,6 +601,7 @@ export const appRouter = router({
   agent: agentRouter,
   tracking: trackingRouter,
   sitemap: sitemapRouter,
+  ads: adsRouter,
 });
 
 export type AppRouter = typeof appRouter;

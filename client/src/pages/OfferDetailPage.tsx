@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, ExternalLink, Star, Clock, AlertTriangle, ArrowLeft } from "lucide-react";
 import ContextualTools from "@/components/ContextualTools";
+import { SidebarAd } from "@/components/AffiliateAdComponents";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -347,6 +348,8 @@ export default function OfferDetailPage() {
                 </a>
               </div>
             )}
+
+            <SidebarAd tags={[category?.slug ?? ""]} />
 
             <div className="card-premium p-5">
               <h3 className="font-semibold text-sm text-foreground mb-2">Affiliate Disclaimer</h3>

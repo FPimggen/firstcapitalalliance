@@ -36,6 +36,13 @@
       "when": 1780326863900,
       "tag": "0004_daffy_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1780560639798,
+      "tag": "0005_sleepy_tattoo",
+      "breakpoints": true
     }
   ]
 }

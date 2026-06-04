@@ -258,3 +258,23 @@ export const sitemapMeta = mysqlTable("sitemap_meta", {
 
 export type SitemapMeta = typeof sitemapMeta.$inferSelect;
 export type InsertSitemapMeta = typeof sitemapMeta.$inferInsert;
+
+// ─── Affiliate Ads ─────────────────────────────────────────────────────────────
+export const affiliateAds = mysqlTable("affiliate_ads", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  marketplace: varchar("marketplace", { length: 100 }).notNull().default(""),
+  affiliateLink: text("affiliateLink").notNull(),
+  squareImageUrl: text("squareImageUrl"),
+  verticalImageUrl: text("verticalImageUrl"),
+  horizontalImageUrl: text("horizontalImageUrl"),
+  priority: mysqlEnum("priority", ["low", "moderate", "high"]).notNull().default("moderate"),
+  // Comma-separated page context tags e.g. "credit-cards,credit-builder,travel"
+  tags: text("tags"),
+  isActive: boolean("isActive").notNull().default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AffiliateAd = typeof affiliateAds.$inferSelect;
+export type InsertAffiliateAd = typeof affiliateAds.$inferInsert;

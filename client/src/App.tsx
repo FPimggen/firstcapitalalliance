@@ -35,6 +35,7 @@ import { PersonalLoanCalculator, LoanComparisonCalculator, DebtConsolidationCalc
 import { CreditCardPayoffCalculator, CreditCardInterestCalculator, CreditCardRefiCalculator, BalanceTransferCalculator } from "./pages/tools/CreditCardCalculators";
 import { AprApyConverter, DTICalculator } from "./pages/tools/GeneralCalculators";
 import AdminArticles from "./pages/admin/AdminArticles";
+import AdminAds from "./pages/admin/AdminAds";
 import { CreditScoreHubPage, CardsByScorePage, AutoLoansByScorePage, MortgagesByScorePage, PersonalLoansByScorePage } from "./pages/CreditScoreHub";
 import { GlossaryIndexPage, GlossaryTermPage } from "./pages/Glossary";
 import CreditCardCompareTool from "./pages/CreditCardCompareTool";
@@ -153,6 +154,7 @@ function Router() {
       <Route path="/admin/ai-tools">{() => <AdminRoute component={AdminAITools} />}</Route>
       <Route path="/admin/audit-log">{() => <AdminRoute component={AdminAuditLog} />}</Route>
       <Route path="/admin/analytics">{() => <AdminRoute component={AdminAnalytics} />}</Route>
+      <Route path="/admin/ads">{() => <AdminRoute component={AdminAds} />}</Route>
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

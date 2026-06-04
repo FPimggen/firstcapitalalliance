@@ -182,3 +182,13 @@
 - [x] Register /api/scheduled/github-card-sync endpoint in server/_core/index.ts
 - [ ] Create daily Heartbeat cron (2 AM UTC) via manus-heartbeat CLI after deploy (requires deploy first)
 - [x] Add "Run Pipeline Now" button to Admin Dashboard
+
+## AWIN Affiliate Ads System
+- [x] Add affiliate_ads table to drizzle/schema.ts (name, marketplace, affiliateLink, squareImageUrl, verticalImageUrl, horizontalImageUrl, priority, tags, isActive, createdAt)
+- [x] Generate and apply DB migration
+- [x] Add adsRouter to server/routers.ts (list, create, update, delete, toggleActive)
+- [x] Build AdminAds.tsx CRUD page with image upload for all 3 ad formats
+- [x] Register /admin/ads route in App.tsx and AdminLayout sidebar
+- [x] Build reusable AffiliateAd components (SidebarAd, InlineAd, NotificationBarAd, InSearchAd)
+- [x] Wire ad components into ComparisonPage (SidebarAd + InlineAd), OfferDetailPage (SidebarAd), PublicLayout (NotificationBarAd)
+- [x] TypeScript check and checkpoint

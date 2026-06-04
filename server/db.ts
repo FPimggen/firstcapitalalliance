@@ -29,6 +29,9 @@ import {
   providers,
   sitemapMeta,
   users,
+  affiliateAds,
+  AffiliateAd,
+  InsertAffiliateAd,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -517,4 +520,38 @@ export async function getSitemapData() {
     db.select({ slug: articles.slug, updatedAt: articles.updatedAt }).from(articles).where(eq(articles.status, "published")),
   ]);
   return { cats, provs, offs, arts };
+}
+
+// ─── Affiliate Ads ────────────────────────────────────────────────────────────
+export async function getAffiliateAds(activeOnly = false) {
+  const db = await getDb();
+  if (!db) return [];
+  const query = db.select().from(affiliateAds);
+  if (activeOnly) return query.where(eq(affiliateAds.isActive, true));
+  return query.orderBy(affiliateAds.createdAt);
+}
+
+export async function getActiveAdsByTags(tags: string[]) {
+  const db = await getDb();
+  if (!db) return [];
+  // Return all active ads; tag filtering is done in the router/component
+  return db.select().from(affiliateAds).where(eq(affiliateAds.isActive, true));
+}
+
+export async function createAffiliateAd(data: InsertAffiliateAd) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(affiliateAds).values(data);
+}
+
+export async function updateAffiliateAd(id: number, data: Partial<InsertAffiliateAd>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(affiliateAds).set(data).where(eq(affiliateAds.id, id));
+}
+
+export async function deleteAffiliateAd(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(affiliateAds).where(eq(affiliateAds.id, id));
 }

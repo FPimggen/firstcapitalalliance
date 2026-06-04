@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, Shield } from "lucide-react";
+import { NotificationBarAd } from "./AffiliateAdComponents";
 
 const LOGO_HORIZONTAL_WHITE = "/manus-storage/logo-horizontal-white_7e0d1f33.png";
 const LOGO_HORIZONTAL_BLACK = "/manus-storage/logo-horizontal-black_bf04384f.png";
@@ -401,6 +402,7 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children, showDisclosure = true }: PublicLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
+      <NotificationBarAd />
       {showDisclosure && <DisclosureBanner />}
       <PublicNav />
       <main className="flex-1">{children}</main>

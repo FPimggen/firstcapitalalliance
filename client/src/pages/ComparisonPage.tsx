@@ -6,6 +6,7 @@ import OfferTable from "@/components/OfferTable";
 import { trpc } from "@/lib/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
+import { SidebarAd, InlineAd } from "@/components/AffiliateAdComponents";
 
 const CATEGORY_META: Record<string, { title: string; description: string; hero: string; faqs: { q: string; a: string }[] }> = {
   "credit-cards": {
@@ -127,7 +128,10 @@ export default function ComparisonPage({ categorySlug: propSlug }: { categorySlu
                 {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
               </div>
             ) : offers && offers.length > 0 ? (
-              <OfferTable offers={offers} />
+              <>
+                <OfferTable offers={offers} />
+                <InlineAd tags={[categorySlug]} />
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <AlertCircle className="w-10 h-10 text-muted-foreground mb-3" />
@@ -146,6 +150,7 @@ export default function ComparisonPage({ categorySlug: propSlug }: { categorySlu
               </p>
               <a href="/methodology" className="text-xs text-accent hover:underline mt-3 block">Read our full methodology →</a>
             </div>
+            <SidebarAd tags={[categorySlug]} />
             <div className="card-premium p-5">
               <h3 className="font-semibold text-sm text-foreground mb-3">Related Guides</h3>
               <ul className="space-y-2">
