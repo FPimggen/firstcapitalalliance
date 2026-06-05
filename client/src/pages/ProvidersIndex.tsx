@@ -42,8 +42,26 @@ export default function ProvidersIndex() {
               <Link key={provider.id} href={`/providers/${provider.slug}`}>
                 <div className="card-premium p-5 cursor-pointer hover:border-accent/40 transition-all group h-full">
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-[var(--navy-100)] flex items-center justify-center text-sm font-bold text-[var(--navy-700)] uppercase shrink-0">
-                      {provider.name.slice(0, 2)}
+                    <div className="w-12 h-10 shrink-0 flex items-center justify-center">
+                      {provider.logoUrl ? (
+                        <img
+                          src={provider.logoUrl}
+                          alt={provider.name}
+                          className="w-12 h-10 object-contain"
+                          onError={(e) => {
+                            const el = e.currentTarget;
+                            el.style.display = "none";
+                            const fallback = el.nextElementSibling as HTMLElement | null;
+                            if (fallback) fallback.style.display = "flex";
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className="w-10 h-10 rounded-lg bg-[var(--navy-100)] items-center justify-center text-sm font-bold text-[var(--navy-700)] uppercase"
+                        style={{ display: provider.logoUrl ? "none" : "flex" }}
+                      >
+                        {provider.name.slice(0, 2)}
+                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-foreground group-hover:text-accent transition-colors truncate">{provider.name}</div>
