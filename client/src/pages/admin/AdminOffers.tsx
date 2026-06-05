@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +52,9 @@ export default function AdminOffers() {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<OfferForm>(EMPTY_FORM);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("name-asc");
 
   const { data: offers, isLoading, refetch } = trpc.offers.listAll.useQuery();
   const { data: providers } = trpc.providers.listAll.useQuery();
@@ -165,9 +168,37 @@ export default function AdminOffers() {
     }
   };
 
-  const filtered = (offers ?? []).filter((o) =>
-    !search || o.offer.productName.toLowerCase().includes(search.toLowerCase()) || o.provider?.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    let result = offers ?? [];
+    // Search
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter((o) =>
+        o.offer.productName.toLowerCase().includes(q) ||
+        (o.provider?.name ?? "").toLowerCase().includes(q)
+      );
+    }
+    // Category filter
+    if (categoryFilter !== "all") {
+      result = result.filter((o) => o.category?.slug === categoryFilter);
+    }
+    // Status filter
+    if (statusFilter === "active") result = result.filter((o) => o.offer.isActive);
+    else if (statusFilter === "inactive") result = result.filter((o) => !o.offer.isActive);
+    // Sort
+    result = [...result].sort((a, b) => {
+      switch (sortBy) {
+        case "name-asc": return a.offer.productName.localeCompare(b.offer.productName);
+        case "name-desc": return b.offer.productName.localeCompare(a.offer.productName);
+        case "rating-desc": return parseFloat(b.offer.overallRating ?? "0") - parseFloat(a.offer.overallRating ?? "0");
+        case "rating-asc": return parseFloat(a.offer.overallRating ?? "0") - parseFloat(b.offer.overallRating ?? "0");
+        case "newest": return (b.offer.id ?? 0) - (a.offer.id ?? 0);
+        case "oldest": return (a.offer.id ?? 0) - (b.offer.id ?? 0);
+        default: return 0;
+      }
+    });
+    return result;
+  }, [offers, search, categoryFilter, statusFilter, sortBy]);
 
   return (
     <div className="space-y-6">
@@ -181,9 +212,57 @@ export default function AdminOffers() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Input placeholder="Search offers..." value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-xs" />
-        <span className="text-sm text-muted-foreground">{filtered.length} offer{filtered.length !== 1 ? "s" : ""}</span>
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          placeholder="Search offers..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-xs"
+        />
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="All categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {(categories ?? []).map((c) => (
+              <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active Only</SelectItem>
+            <SelectItem value="inactive">Inactive Only</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name-asc">Name A → Z</SelectItem>
+            <SelectItem value="name-desc">Name Z → A</SelectItem>
+            <SelectItem value="rating-desc">Highest Rating</SelectItem>
+            <SelectItem value="rating-asc">Lowest Rating</SelectItem>
+            <SelectItem value="newest">Newest First</SelectItem>
+            <SelectItem value="oldest">Oldest First</SelectItem>
+          </SelectContent>
+        </Select>
+        <span className="text-sm text-muted-foreground">
+          {filtered.length} of {(offers ?? []).length} offer{filtered.length !== 1 ? "s" : ""}
+          {(offers ?? []).filter(o => o.offer.isActive).length > 0 && (
+            <span className="ml-2 text-xs">
+              ({(offers ?? []).filter(o => o.offer.isActive).length} active
+              {" / "}
+              {(offers ?? []).filter(o => !o.offer.isActive).length} inactive)
+            </span>
+          )}
+        </span>
       </div>
 
       {isLoading ? (
