@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import OfferTable from "@/components/OfferTable";
 import { trpc } from "@/lib/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, BookOpen, Calculator, ChevronRight, Star } from "lucide-react";
 import { SidebarAd, InlineAd } from "@/components/AffiliateAdComponents";
 
 const CATEGORY_META: Record<string, { title: string; description: string; hero: string; faqs: { q: string; a: string }[] }> = {
@@ -143,28 +143,68 @@ export default function ComparisonPage({ categorySlug: propSlug }: { categorySlu
 
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-5">
+
+            {/* Methodology */}
             <div className="card-premium p-5">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Our Methodology</h3>
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-accent shrink-0" />
+                <h3 className="font-semibold text-sm text-foreground">Our Methodology</h3>
+              </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 We evaluate products on APR, fees, rewards value, eligibility, and customer experience. Ratings are assigned independently of advertiser relationships.
               </p>
               <a href="/methodology" className="text-xs text-accent hover:underline mt-3 block">Read our full methodology →</a>
             </div>
+
+            {/* Affiliate ad */}
             <SidebarAd tags={[categorySlug]} />
+
+            {/* Related Guides */}
             <div className="card-premium p-5">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Related Guides</h3>
+              <div className="flex items-center gap-2 mb-3">
+                <BookOpen className="w-4 h-4 text-accent shrink-0" />
+                <h3 className="font-semibold text-sm text-foreground">Related Guides</h3>
+              </div>
               <ul className="space-y-2">
                 {[
                   ["How to Choose a Credit Card", "/learn/how-to-choose-credit-card"],
                   ["Understanding APR", "/learn/understanding-apr"],
                   ["Building Credit from Scratch", "/learn/building-credit"],
+                  ["How to Improve Your Credit Score", "/credit-score"],
                 ].map(([label, href]) => (
                   <li key={href}>
-                    <a href={href} className="text-xs text-accent hover:underline">{label}</a>
+                    <a href={href} className="flex items-center gap-1.5 text-xs text-accent hover:underline">
+                      <ChevronRight className="w-3 h-3 shrink-0" />
+                      {label}
+                    </a>
                   </li>
                 ))}
               </ul>
             </div>
+
+            {/* Related Tools */}
+            <div className="card-premium p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Calculator className="w-4 h-4 text-accent shrink-0" />
+                <h3 className="font-semibold text-sm text-foreground">Related Tools</h3>
+              </div>
+              <ul className="space-y-2">
+                {[
+                  ["Credit Card Payoff Calculator", "/tools/credit-card-payoff-calculator"],
+                  ["Balance Transfer Calculator", "/tools/balance-transfer-calculator"],
+                  ["Debt Payoff Calculator", "/tools/debt-payoff-calculator"],
+                  ["Personal Loan Calculator", "/tools/personal-loan-calculator"],
+                ].map(([label, href]) => (
+                  <li key={href}>
+                    <a href={href} className="flex items-center gap-1.5 text-xs text-accent hover:underline">
+                      <ChevronRight className="w-3 h-3 shrink-0" />
+                      {label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
           </div>
         </div>
 

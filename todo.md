@@ -192,3 +192,9 @@
 - [x] Build reusable AffiliateAd components (SidebarAd, InlineAd, NotificationBarAd, InSearchAd)
 - [x] Wire ad components into ComparisonPage (SidebarAd + InlineAd), OfferDetailPage (SidebarAd), PublicLayout (NotificationBarAd)
 - [x] TypeScript check and checkpoint
+
+## Sidebar on All List/Comparison Pages
+- [x] Extract sidebar from /credit-cards into a reusable ComparisonSidebar component
+- [x] Add sidebar to /credit-cards/cash-back, /travel, /balance-transfer, /credit-builder (CreditCardSubCategoryPage) — methodology, quick tips, SidebarAd, related guides, related tools, browse by card type
+- [x] ComparisonPage already has sidebar (methodology + SidebarAd + related guides) — confirmed on all category pages
+- [x] Sidebar includes: SidebarAd, quick tips, related guides, related tools, browse by card type nav
