@@ -186,6 +186,7 @@ export default function CreditCardCompareTool() {
   const { data: offersData, isLoading } = trpc.offers.byCategory.useQuery({ categorySlug: "credit-cards" });
   const offers: Offer[] = ((offersData ?? []).map((item: any) => ({
     ...item.offer,
+    name: item.offer.productName ?? item.offer.name ?? "",
     providerName: item.provider?.name ?? null,
   }))) as Offer[];
 
