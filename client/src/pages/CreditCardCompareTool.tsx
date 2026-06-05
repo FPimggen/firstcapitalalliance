@@ -12,6 +12,7 @@ interface Offer {
   id: number;
   name: string;
   providerName?: string | null;
+  imageUrl?: string | null;
   apr?: string | null;
   aprMin?: number | null;
   aprMax?: number | null;
@@ -146,10 +147,27 @@ function CardSelector({
                 <button
                   key={o.id}
                   onClick={() => { onSelect(o); setOpen(false); setSearch(""); }}
-                  className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0"
+                  className="w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 flex items-center gap-3"
                 >
-                  <p className="text-sm font-medium text-foreground">{o.name}</p>
-                  <p className="text-xs text-muted-foreground">{o.providerName} {o.apr ? `· ${o.apr}` : ""}</p>
+                  {o.imageUrl ? (
+                    <img src={o.imageUrl} alt={o.name} className="w-12 h-8 object-contain shrink-0 rounded" />
+                  ) : (
+                    <div className="w-12 h-8 shrink-0 rounded bg-muted/60 flex items-center justify-center">
+                      <span className="text-[9px] text-muted-foreground font-medium leading-tight text-center px-1">{o.providerName?.slice(0, 4) ?? "—"}</span>
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground truncate">{o.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-muted-foreground truncate">{o.providerName}</span>
+                      {o.rating != null && (
+                        <span className="flex items-center gap-0.5 shrink-0">
+                          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                          <span className="text-xs text-muted-foreground">{o.rating.toFixed(1)}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </button>
               ))
             )}
@@ -303,7 +321,27 @@ export default function CreditCardCompareTool() {
                     <td colSpan={4} className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">Key Numbers</td>
                   </tr>
                   <CompareRow label="APR" values={selectedCards.map(formatApr)} highlight />
-                  <CompareRow label="Annual Fee" values={selectedCards.map(formatFee)} />
+                  <tr className="">
+                    <td className="px-4 py-3.5 text-sm font-medium text-muted-foreground w-40 shrink-0 border-r border-border">Annual Fee</td>
+                    {selectedCards.map((o, i) => (
+                      <td key={i} className="px-4 py-3.5 text-sm text-foreground border-r border-border last:border-r-0 text-center">
+                        {o.annualFee == null ? (
+                          <Minus className="w-4 h-4 text-muted-foreground/40 mx-auto" />
+                        ) : o.annualFee === 0 ? (
+                          <span className="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+                            <Check className="w-4 h-4" /> No Fee
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 text-red-500">
+                            <X className="w-4 h-4" /> ${o.annualFee}/yr
+                          </span>
+                        )}
+                      </td>
+                    ))}
+                    {Array.from({ length: Math.max(0, 3 - selectedCards.length) }).map((_, i) => (
+                      <td key={`empty-${i}`} className="px-4 py-3.5 border-r border-border last:border-r-0" />
+                    ))}
+                  </tr>
                   <CompareRow label="Rewards Rate" values={selectedCards.map((o) => o.rewardsRate)} highlight />
                   <CompareRow label="Sign-Up Bonus" values={selectedCards.map((o) => o.signupBonus)} />
                   <CompareRow label="Min. Credit Score" values={selectedCards.map(formatScore)} highlight />
